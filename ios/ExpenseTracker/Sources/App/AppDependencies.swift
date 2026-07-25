@@ -7,12 +7,14 @@ final class AppDependencies {
     private let transactionRepository: TransactionRepository
     private let categoryRepository: CategoryRepository
     private let userRepository: UserRepository
+    private let summaryRepository: SummaryRepository
 
     init() {
         apiClient = APIClient(baseURL: APIConfiguration.baseURL)
         transactionRepository = RemoteTransactionRepository(apiClient: apiClient)
         categoryRepository = RemoteCategoryRepository(apiClient: apiClient)
         userRepository = RemoteUserRepository(apiClient: apiClient)
+        summaryRepository = RemoteSummaryRepository(apiClient: apiClient)
     }
 
     @MainActor
@@ -22,5 +24,10 @@ final class AppDependencies {
             categoryRepository: categoryRepository,
             userRepository: userRepository
         )
+    }
+
+    @MainActor
+    func makeReportViewModel() -> ReportViewModel {
+        ReportViewModel(summaryRepository: summaryRepository)
     }
 }

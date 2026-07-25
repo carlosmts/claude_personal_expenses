@@ -8,7 +8,7 @@ struct RootView: View {
             HomeView(viewModel: dependencies.makeTransactionsViewModel())
                 .tabItem { Label("Home", systemImage: "house.fill") }
 
-            ComingSoonView(title: "Report", systemImage: "chart.pie.fill")
+            ReportView(viewModel: dependencies.makeReportViewModel())
                 .tabItem { Label("Report", systemImage: "chart.pie.fill") }
 
             ComingSoonView(title: "Plan", systemImage: "target")

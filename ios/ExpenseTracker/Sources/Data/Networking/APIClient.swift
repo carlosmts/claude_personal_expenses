@@ -17,8 +17,18 @@ final class APIClient {
         encoder = Self.makeEncoder()
     }
 
-    func get<Response: Decodable>(_ path: String) async throws -> Response {
-        let request = URLRequest(url: baseURL.appendingPathComponent(path))
+    func get<Response: Decodable>(_ path: String, queryItems: [URLQueryItem] = []) async throws -> Response {
+        var components = URLComponents(
+            url: baseURL.appendingPathComponent(path),
+            resolvingAgainstBaseURL: false
+        )
+        if !queryItems.isEmpty {
+            components?.queryItems = queryItems
+        }
+        guard let url = components?.url else {
+            throw APIError.invalidResponse
+        }
+        let request = URLRequest(url: url)
         return try await send(request)
     }
 
