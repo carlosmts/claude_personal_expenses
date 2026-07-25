@@ -4,6 +4,7 @@
 // numeric amounts — the same DTO -> domain split used on iOS.
 
 import type { Category } from '../domain/category';
+import type { DashboardSummary, MonthBreakdown } from '../domain/dashboard';
 import type { Goal, GoalInput } from '../domain/goal';
 import type { CategoryAmount, MonthlySummary, UserAmount } from '../domain/summary';
 import type { Transaction, TransactionInput } from '../domain/transaction';
@@ -142,5 +143,43 @@ export function monthlySummaryFromDto(dto: MonthlySummaryDto): MonthlySummary {
     expensesByCategory: dto.expenses_by_category.map(categoryAmountFromDto),
     incomeByCategory: dto.income_by_category.map(categoryAmountFromDto),
     byUser: dto.by_user.map(userAmountFromDto),
+  };
+}
+
+export interface MonthBreakdownDto {
+  month: number;
+  income: string;
+  expense: string;
+}
+
+function monthBreakdownFromDto(dto: MonthBreakdownDto): MonthBreakdown {
+  return { month: dto.month, income: Number(dto.income), expense: Number(dto.expense) };
+}
+
+export interface DashboardSummaryDto {
+  year: number;
+  all_time_income: string;
+  all_time_expense: string;
+  current_month_income: string;
+  current_month_expense: string;
+  previous_month_income: string;
+  previous_month_expense: string;
+  previous_year_month_income: string;
+  previous_year_month_expense: string;
+  monthly_breakdown: MonthBreakdownDto[];
+}
+
+export function dashboardSummaryFromDto(dto: DashboardSummaryDto): DashboardSummary {
+  return {
+    year: dto.year,
+    allTimeIncome: Number(dto.all_time_income),
+    allTimeExpense: Number(dto.all_time_expense),
+    currentMonthIncome: Number(dto.current_month_income),
+    currentMonthExpense: Number(dto.current_month_expense),
+    previousMonthIncome: Number(dto.previous_month_income),
+    previousMonthExpense: Number(dto.previous_month_expense),
+    previousYearMonthIncome: Number(dto.previous_year_month_income),
+    previousYearMonthExpense: Number(dto.previous_year_month_expense),
+    monthlyBreakdown: dto.monthly_breakdown.map(monthBreakdownFromDto),
   };
 }
