@@ -16,7 +16,7 @@ private enum TransactionFormMode: Identifiable {
     }
 }
 
-struct TransactionsView: View {
+struct HomeView: View {
     @StateObject private var viewModel: TransactionsViewModel
     @State private var formMode: TransactionFormMode?
     @State private var pendingDeleteOffsets: IndexSet?
@@ -30,32 +30,55 @@ struct TransactionsView: View {
             Group {
                 if viewModel.isLoading && viewModel.transactions.isEmpty {
                     ProgressView()
-                } else if viewModel.transactions.isEmpty {
-                    ContentUnavailableView(
-                        "No Transactions Yet",
-                        systemImage: "tray",
-                        description: Text("Transactions you add will show up here.")
-                    )
                 } else {
                     List {
-                        ForEach(viewModel.transactions) { transaction in
-                            Button {
-                                formMode = .edit(transaction)
-                            } label: {
-                                TransactionRowView(transaction: transaction)
+                        Section {
+                            BalanceCardView(balance: totalBalance)
+                                .listRowInsets(EdgeInsets())
+                                .listRowBackground(Color.clear)
+                                .listRowSeparator(.hidden)
+
+                            HStack(spacing: 12) {
+                                StatTileView(title: "Income (this month)", amount: monthlyIncome, tintColor: .green)
+                                StatTileView(title: "Expenses (this month)", amount: monthlyExpenses, tintColor: .red)
                             }
-                            .buttonStyle(.plain)
+                            .listRowInsets(EdgeInsets())
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
                         }
-                        .onDelete { offsets in
-                            pendingDeleteOffsets = offsets
+
+                        if viewModel.transactions.isEmpty {
+                            Section {
+                                ContentUnavailableView(
+                                    "No Transactions Yet",
+                                    systemImage: "tray",
+                                    description: Text("Transactions you add will show up here.")
+                                )
+                                .listRowSeparator(.hidden)
+                            }
+                        } else {
+                            Section("Transactions") {
+                                ForEach(viewModel.transactions) { transaction in
+                                    Button {
+                                        formMode = .edit(transaction)
+                                    } label: {
+                                        TransactionRowView(transaction: transaction)
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                                .onDelete { offsets in
+                                    pendingDeleteOffsets = offsets
+                                }
+                            }
                         }
                     }
+                    .listStyle(.plain)
                     .refreshable {
                         await viewModel.loadTransactions()
                     }
                 }
             }
-            .navigationTitle("Transactions")
+            .navigationTitle("Home")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
@@ -110,5 +133,34 @@ struct TransactionsView: View {
         .task {
             await viewModel.loadTransactions()
         }
+    }
+
+    /// All-time net (every income transaction minus every expense transaction).
+    private var totalBalance: Decimal {
+        viewModel.transactions.reduce(Decimal(0)) { partial, transaction in
+            partial + (transaction.type == .income ? transaction.amount : -transaction.amount)
+        }
+    }
+
+    /// Simple client-side filter for "this calendar month" — a stopgap until
+    /// the backend's monthly aggregation endpoint lands for the Report tab.
+    private var currentMonthTransactions: [Transaction] {
+        let calendar = Calendar.current
+        let now = Date()
+        return viewModel.transactions.filter {
+            calendar.isDate($0.date, equalTo: now, toGranularity: .month)
+        }
+    }
+
+    private var monthlyIncome: Decimal {
+        currentMonthTransactions
+            .filter { $0.type == .income }
+            .reduce(Decimal(0)) { $0 + $1.amount }
+    }
+
+    private var monthlyExpenses: Decimal {
+        currentMonthTransactions
+            .filter { $0.type == .expense }
+            .reduce(Decimal(0)) { $0 + $1.amount }
     }
 }

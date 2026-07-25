@@ -6,7 +6,7 @@ struct ExpenseTrackerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TransactionsView(viewModel: dependencies.makeTransactionsViewModel())
+            RootView(dependencies: dependencies)
         }
     }
 }
