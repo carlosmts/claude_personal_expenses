@@ -17,7 +17,7 @@ interface SidebarProps {
 export function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
   return (
     <nav
-      className={`sticky top-0 flex h-screen shrink-0 flex-col bg-indigo-700 py-6 text-white transition-all ${
+      className={`sticky top-0 flex h-screen shrink-0 flex-col bg-slate-600 py-6 text-white transition-all ${
         collapsed ? 'w-20 px-2' : 'w-60 px-4'
       }`}
     >
@@ -26,7 +26,7 @@ export function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
         <button
           type="button"
           onClick={onToggleCollapsed}
-          className="shrink-0 rounded-lg p-1.5 text-indigo-100 hover:bg-white/10"
+          className="shrink-0 rounded-lg p-1.5 text-slate-200 hover:bg-white/10"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           <Menu size={20} />
@@ -42,7 +42,7 @@ export function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
                   collapsed ? 'justify-center' : ''
-                } ${isActive ? 'bg-white/15 text-white' : 'text-indigo-100 hover:bg-white/10'}`
+                } ${isActive ? 'bg-slate-800 text-white' : 'text-slate-200 hover:bg-white/10'}`
               }
             >
               <Icon size={18} />

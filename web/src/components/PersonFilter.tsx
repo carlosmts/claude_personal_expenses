@@ -36,7 +36,7 @@ function FilterButton({
       type="button"
       onClick={onClick}
       className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
-        active ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+        active ? 'bg-slate-700 text-white' : 'text-gray-600 hover:bg-gray-100'
       }`}
     >
       {children}
