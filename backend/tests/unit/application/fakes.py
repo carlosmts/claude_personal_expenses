@@ -1,9 +1,11 @@
 from app.domain.entities.category import Category
+from app.domain.entities.dashboard import DashboardSummary
 from app.domain.entities.goal import Goal
 from app.domain.entities.summary import MonthlySummary
 from app.domain.entities.transaction import Transaction
 from app.domain.entities.user import User
 from app.domain.repositories.category_repository import CategoryRepository
+from app.domain.repositories.dashboard_repository import DashboardRepository
 from app.domain.repositories.goal_repository import GoalRepository
 from app.domain.repositories.summary_repository import SummaryRepository
 from app.domain.repositories.transaction_repository import TransactionRepository
@@ -146,3 +148,11 @@ class FakeGoalRepository(GoalRepository):
             return False
         del self._goals[index]
         return True
+
+
+class FakeDashboardRepository(DashboardRepository):
+    def __init__(self, summary: DashboardSummary) -> None:
+        self._summary = summary
+
+    async def get_dashboard_summary(self, year: int, user_id: int | None) -> DashboardSummary:
+        return self._summary

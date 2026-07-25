@@ -9,6 +9,7 @@ from app.application.use_cases.create_transaction import CreateTransactionUseCas
 from app.application.use_cases.delete_category import DeleteCategoryUseCase
 from app.application.use_cases.delete_goal import DeleteGoalUseCase
 from app.application.use_cases.delete_transaction import DeleteTransactionUseCase
+from app.application.use_cases.get_dashboard_summary import GetDashboardSummaryUseCase
 from app.application.use_cases.get_monthly_summary import GetMonthlySummaryUseCase
 from app.application.use_cases.list_categories import ListCategoriesUseCase
 from app.application.use_cases.list_goals import ListGoalsUseCase
@@ -21,6 +22,9 @@ from app.application.use_cases.update_user import UpdateUserUseCase
 from app.infrastructure.database import get_db_session
 from app.infrastructure.repositories.sqlalchemy_category_repository import (
     SqlAlchemyCategoryRepository,
+)
+from app.infrastructure.repositories.sqlalchemy_dashboard_repository import (
+    SqlAlchemyDashboardRepository,
 )
 from app.infrastructure.repositories.sqlalchemy_goal_repository import (
     SqlAlchemyGoalRepository,
@@ -214,3 +218,23 @@ CreateGoalUseCaseDep = Annotated[CreateGoalUseCase, Depends(get_create_goal_use_
 ListGoalsUseCaseDep = Annotated[ListGoalsUseCase, Depends(get_list_goals_use_case)]
 UpdateGoalUseCaseDep = Annotated[UpdateGoalUseCase, Depends(get_update_goal_use_case)]
 DeleteGoalUseCaseDep = Annotated[DeleteGoalUseCase, Depends(get_delete_goal_use_case)]
+
+
+def get_dashboard_repository(session: DbSession) -> SqlAlchemyDashboardRepository:
+    return SqlAlchemyDashboardRepository(session)
+
+
+DashboardRepositoryDep = Annotated[
+    SqlAlchemyDashboardRepository, Depends(get_dashboard_repository)
+]
+
+
+def get_dashboard_summary_use_case(
+    dashboard_repository: DashboardRepositoryDep,
+) -> GetDashboardSummaryUseCase:
+    return GetDashboardSummaryUseCase(dashboard_repository)
+
+
+GetDashboardSummaryUseCaseDep = Annotated[
+    GetDashboardSummaryUseCase, Depends(get_dashboard_summary_use_case)
+]
