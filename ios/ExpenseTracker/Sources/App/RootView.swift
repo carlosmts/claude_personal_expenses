@@ -11,7 +11,7 @@ struct RootView: View {
             ReportView(viewModel: dependencies.makeReportViewModel())
                 .tabItem { Label("Report", systemImage: "chart.pie.fill") }
 
-            ComingSoonView(title: "Plan", systemImage: "target")
+            PlanView(viewModel: dependencies.makePlanViewModel())
                 .tabItem { Label("Plan", systemImage: "target") }
 
             ComingSoonView(title: "Settings", systemImage: "gearshape.fill")

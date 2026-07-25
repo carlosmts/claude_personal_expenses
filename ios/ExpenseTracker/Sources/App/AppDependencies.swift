@@ -8,6 +8,7 @@ final class AppDependencies {
     private let categoryRepository: CategoryRepository
     private let userRepository: UserRepository
     private let summaryRepository: SummaryRepository
+    private let goalRepository: GoalRepository
 
     init() {
         apiClient = APIClient(baseURL: APIConfiguration.baseURL)
@@ -15,6 +16,7 @@ final class AppDependencies {
         categoryRepository = RemoteCategoryRepository(apiClient: apiClient)
         userRepository = RemoteUserRepository(apiClient: apiClient)
         summaryRepository = RemoteSummaryRepository(apiClient: apiClient)
+        goalRepository = RemoteGoalRepository(apiClient: apiClient)
     }
 
     @MainActor
@@ -29,5 +31,10 @@ final class AppDependencies {
     @MainActor
     func makeReportViewModel() -> ReportViewModel {
         ReportViewModel(summaryRepository: summaryRepository)
+    }
+
+    @MainActor
+    func makePlanViewModel() -> PlanViewModel {
+        PlanViewModel(goalRepository: goalRepository, userRepository: userRepository)
     }
 }
