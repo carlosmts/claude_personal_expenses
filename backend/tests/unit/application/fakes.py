@@ -62,3 +62,17 @@ class FakeTransactionRepository(TransactionRepository):
 
     async def get_by_id(self, transaction_id: int) -> Transaction | None:
         return next((t for t in self._transactions if t.id == transaction_id), None)
+
+    async def update(self, transaction: Transaction) -> Transaction:
+        index = next(i for i, t in enumerate(self._transactions) if t.id == transaction.id)
+        self._transactions[index] = transaction
+        return transaction
+
+    async def delete(self, transaction_id: int) -> bool:
+        index = next(
+            (i for i, t in enumerate(self._transactions) if t.id == transaction_id), None
+        )
+        if index is None:
+            return False
+        del self._transactions[index]
+        return True

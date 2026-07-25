@@ -26,24 +26,11 @@ class ListTransactionsUseCase:
         categories_by_id = {category.id: category for category in await self._category_repository.list_all()}
         users_by_id = {user.id: user for user in await self._user_repository.list_all()}
 
-        details: list[TransactionDetail] = []
-        for transaction in transactions:
-            assert transaction.id is not None, "persisted transaction must have an id"
-            category = categories_by_id[transaction.category_id]
-            user = users_by_id[transaction.user_id]
-
-            details.append(
-                TransactionDetail(
-                    id=transaction.id,
-                    date=transaction.date,
-                    type=transaction.type,
-                    amount=transaction.amount,
-                    description=transaction.description,
-                    category_id=transaction.category_id,
-                    category_name=category.name,
-                    user_id=transaction.user_id,
-                    user_name=user.name,
-                )
+        return [
+            TransactionDetail.from_parts(
+                transaction,
+                categories_by_id[transaction.category_id],
+                users_by_id[transaction.user_id],
             )
-
-        return details
+            for transaction in transactions
+        ]

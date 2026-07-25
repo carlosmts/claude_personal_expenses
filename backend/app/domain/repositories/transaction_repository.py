@@ -14,3 +14,9 @@ class TransactionRepository(ABC):
 
     @abstractmethod
     async def get_by_id(self, transaction_id: int) -> Transaction | None: ...
+
+    @abstractmethod
+    async def update(self, transaction: Transaction) -> Transaction: ...
+
+    @abstractmethod
+    async def delete(self, transaction_id: int) -> bool: ...

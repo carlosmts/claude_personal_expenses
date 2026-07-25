@@ -47,3 +47,27 @@ class SqlAlchemyTransactionRepository(TransactionRepository):
     async def get_by_id(self, transaction_id: int) -> Transaction | None:
         model = await self._session.get(TransactionModel, transaction_id)
         return _to_domain(model) if model else None
+
+    async def update(self, transaction: Transaction) -> Transaction:
+        model = await self._session.get(TransactionModel, transaction.id)
+        assert model is not None, "update() requires an existing transaction id"
+
+        model.date = transaction.date
+        model.type = transaction.type
+        model.amount = transaction.amount
+        model.category_id = transaction.category_id
+        model.user_id = transaction.user_id
+        model.description = transaction.description
+
+        await self._session.flush()
+        await self._session.refresh(model)
+        return _to_domain(model)
+
+    async def delete(self, transaction_id: int) -> bool:
+        model = await self._session.get(TransactionModel, transaction_id)
+        if model is None:
+            return False
+
+        await self._session.delete(model)
+        await self._session.flush()
+        return True

@@ -5,9 +5,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.use_cases.create_category import CreateCategoryUseCase
 from app.application.use_cases.create_transaction import CreateTransactionUseCase
+from app.application.use_cases.delete_transaction import DeleteTransactionUseCase
 from app.application.use_cases.list_categories import ListCategoriesUseCase
 from app.application.use_cases.list_transactions import ListTransactionsUseCase
 from app.application.use_cases.list_users import ListUsersUseCase
+from app.application.use_cases.update_transaction import UpdateTransactionUseCase
 from app.infrastructure.database import get_db_session
 from app.infrastructure.repositories.sqlalchemy_category_repository import (
     SqlAlchemyCategoryRepository,
@@ -91,4 +93,30 @@ CreateTransactionUseCaseDep = Annotated[
 ]
 ListTransactionsUseCaseDep = Annotated[
     ListTransactionsUseCase, Depends(get_list_transactions_use_case)
+]
+
+
+def get_update_transaction_use_case(
+    transaction_repository: TransactionRepositoryDep,
+    user_repository: UserRepositoryDep,
+    create_category_use_case: CreateCategoryUseCaseDep,
+) -> UpdateTransactionUseCase:
+    return UpdateTransactionUseCase(
+        transaction_repository=transaction_repository,
+        user_repository=user_repository,
+        create_category_use_case=create_category_use_case,
+    )
+
+
+def get_delete_transaction_use_case(
+    transaction_repository: TransactionRepositoryDep,
+) -> DeleteTransactionUseCase:
+    return DeleteTransactionUseCase(transaction_repository)
+
+
+UpdateTransactionUseCaseDep = Annotated[
+    UpdateTransactionUseCase, Depends(get_update_transaction_use_case)
+]
+DeleteTransactionUseCaseDep = Annotated[
+    DeleteTransactionUseCase, Depends(get_delete_transaction_use_case)
 ]
