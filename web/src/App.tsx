@@ -2,6 +2,8 @@ import { Route, Routes } from 'react-router-dom';
 import { ComingSoon } from './components/ComingSoon';
 import { Layout } from './components/Layout';
 import { DashboardPage } from './features/home/DashboardPage';
+import { PlanPage } from './features/plan/PlanPage';
+import { SettingsPage } from './features/settings/SettingsPage';
 import { TransactionsPage } from './features/transactions/TransactionsPage';
 
 function App() {
@@ -11,8 +13,8 @@ function App() {
         <Route path="/" element={<DashboardPage />} />
         <Route path="/transactions" element={<TransactionsPage />} />
         <Route path="/report" element={<ComingSoon title="Report" />} />
-        <Route path="/plan" element={<ComingSoon title="Plan" />} />
-        <Route path="/settings" element={<ComingSoon title="Settings" />} />
+        <Route path="/plan" element={<PlanPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     </Layout>
   );

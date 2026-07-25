@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api/client';
 import { categoryFromDto, type CategoryDto } from '../../api/dto';
 
@@ -11,5 +11,22 @@ export function useCategories() {
       const dtos = await apiClient.get<CategoryDto[]>('/categories');
       return dtos.map(categoryFromDto);
     },
+  });
+}
+
+export function useRenameCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, name }: { id: number; name: string }) =>
+      apiClient.put<CategoryDto>(`/categories/${id}`, { name }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: CATEGORIES_QUERY_KEY }),
+  });
+}
+
+export function useDeleteCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => apiClient.delete(`/categories/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: CATEGORIES_QUERY_KEY }),
   });
 }

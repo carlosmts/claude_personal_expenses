@@ -10,7 +10,7 @@ interface GrowthBadgeProps {
 export function GrowthBadge({ label, percent, positiveIsGood }: GrowthBadgeProps) {
   if (percent === null) {
     return (
-      <span className="inline-flex items-center gap-1 text-xs text-gray-400">
+      <span className="inline-flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
         {label}: <span className="font-medium">New</span>
       </span>
     );
@@ -21,11 +21,13 @@ export function GrowthBadge({ label, percent, positiveIsGood }: GrowthBadgeProps
   const Icon = isPositive ? ArrowUp : ArrowDown;
 
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs text-gray-500">
+    <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
       {label}:
       <span
         className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 font-medium ${
-          isGood ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+          isGood
+            ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
+            : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'
         }`}
       >
         <Icon size={11} />

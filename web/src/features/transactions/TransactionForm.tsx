@@ -46,14 +46,16 @@ export function TransactionForm({ editingTransaction, onSubmit, onCancel, isSubm
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div className="grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1">
+      <div className="grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1 dark:bg-gray-700">
         {(['expense', 'income'] as const).map((option) => (
           <button
             key={option}
             type="button"
             onClick={() => setType(option)}
             className={`rounded-lg py-1.5 text-sm font-medium capitalize transition-colors ${
-              type === option ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              type === option
+                ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             }`}
           >
             {option}
@@ -62,18 +64,18 @@ export function TransactionForm({ editingTransaction, onSubmit, onCancel, isSubm
       </div>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium text-gray-700">Date</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Date</span>
         <input
           type="date"
           value={date}
           onChange={(event) => setDate(event.target.value)}
           required
-          className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          className="rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
         />
       </label>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium text-gray-700">Amount (EUR)</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Amount (EUR)</span>
         <input
           type="number"
           min="0.01"
@@ -82,12 +84,12 @@ export function TransactionForm({ editingTransaction, onSubmit, onCancel, isSubm
           onChange={(event) => setAmount(event.target.value)}
           placeholder="0.00"
           required
-          className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          className="rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
         />
       </label>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium text-gray-700">Category</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Category</span>
         <input
           type="text"
           list="category-options"
@@ -95,7 +97,7 @@ export function TransactionForm({ editingTransaction, onSubmit, onCancel, isSubm
           onChange={(event) => setCategoryName(event.target.value)}
           placeholder="e.g. Groceries"
           required
-          className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          className="rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
         />
         <datalist id="category-options">
           {(categories ?? []).map((category) => (
@@ -105,25 +107,27 @@ export function TransactionForm({ editingTransaction, onSubmit, onCancel, isSubm
       </label>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium text-gray-700">Description (optional)</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Description (optional)</span>
         <input
           type="text"
           value={description}
           onChange={(event) => setDescription(event.target.value)}
-          className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          className="rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
         />
       </label>
 
       <div className="flex flex-col gap-1">
-        <span className="text-sm font-medium text-gray-700">Who's entering this?</span>
-        <div className="grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Who's entering this?</span>
+        <div className="grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1 dark:bg-gray-700">
           {(users ?? []).map((user) => (
             <button
               key={user.id}
               type="button"
               onClick={() => setUserId(user.id)}
               className={`rounded-lg py-1.5 text-sm font-medium transition-colors ${
-                userId === user.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                userId === user.id
+                  ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white'
+                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
               }`}
             >
               {user.name}
@@ -136,7 +140,7 @@ export function TransactionForm({ editingTransaction, onSubmit, onCancel, isSubm
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
+          className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
         >
           Cancel
         </button>

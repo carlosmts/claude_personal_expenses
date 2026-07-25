@@ -61,7 +61,7 @@ export function TransactionsPage() {
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Transactions</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Transactions</h1>
         <button
           type="button"
           onClick={openAddModal}
@@ -74,15 +74,15 @@ export function TransactionsPage() {
 
       <PersonFilter users={users ?? []} selectedUserId={selectedUserId} onChange={setSelectedUserId} />
 
-      <div className="rounded-2xl bg-white p-6 shadow-sm">
+      <div className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
         {isLoading ? (
-          <p className="text-gray-500">Loading…</p>
+          <p className="text-gray-500 dark:text-gray-400">Loading…</p>
         ) : error ? (
-          <p className="text-red-600">{error.message}</p>
+          <p className="text-red-600 dark:text-red-400">{error.message}</p>
         ) : filteredTransactions.length === 0 ? (
-          <p className="text-gray-500">No transactions yet.</p>
+          <p className="text-gray-500 dark:text-gray-400">No transactions yet.</p>
         ) : (
-          <ul className="flex flex-col divide-y divide-gray-100">
+          <ul className="flex flex-col divide-y divide-gray-100 dark:divide-gray-700">
             {filteredTransactions.map((transaction) => (
               <TransactionRow
                 key={transaction.id}
@@ -123,20 +123,24 @@ function TransactionRow({
     <li className="group flex items-center gap-3 py-3">
       <CategoryIcon categoryName={transaction.categoryName} />
       <div className="min-w-0 flex-1">
-        <p className="truncate font-medium text-gray-900">{transaction.categoryName}</p>
-        {transaction.description ? <p className="truncate text-sm text-gray-500">{transaction.description}</p> : null}
-        <p className="text-xs text-gray-400">
+        <p className="truncate font-medium text-gray-900 dark:text-white">{transaction.categoryName}</p>
+        {transaction.description ? (
+          <p className="truncate text-sm text-gray-500 dark:text-gray-400">{transaction.description}</p>
+        ) : null}
+        <p className="text-xs text-gray-400 dark:text-gray-500">
           {transaction.userName} · {transaction.date}
         </p>
       </div>
-      <p className={`shrink-0 font-semibold ${transaction.type === 'expense' ? 'text-red-600' : 'text-green-600'}`}>
+      <p
+        className={`shrink-0 font-semibold ${transaction.type === 'expense' ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}
+      >
         {formatCurrency(signedAmount)}
       </p>
       <div className="flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
         <button
           type="button"
           onClick={onEdit}
-          className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
           aria-label="Edit"
         >
           <Pencil size={16} />
@@ -144,7 +148,7 @@ function TransactionRow({
         <button
           type="button"
           onClick={onDelete}
-          className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+          className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400"
           aria-label="Delete"
         >
           <Trash2 size={16} />
