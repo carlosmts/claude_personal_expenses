@@ -21,3 +21,13 @@ class SqlAlchemyUserRepository(UserRepository):
     async def get_by_id(self, user_id: int) -> User | None:
         model = await self._session.get(UserModel, user_id)
         return _to_domain(model) if model else None
+
+    async def update(self, user: User) -> User:
+        model = await self._session.get(UserModel, user.id)
+        assert model is not None, "update() requires an existing user id"
+
+        model.name = user.name
+
+        await self._session.flush()
+        await self._session.refresh(model)
+        return _to_domain(model)

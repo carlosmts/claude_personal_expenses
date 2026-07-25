@@ -17,3 +17,9 @@ class CategoryRepository(ABC):
 
     @abstractmethod
     async def get_by_id(self, category_id: int) -> Category | None: ...
+
+    @abstractmethod
+    async def update(self, category: Category) -> Category: ...
+
+    @abstractmethod
+    async def delete(self, category_id: int) -> bool: ...

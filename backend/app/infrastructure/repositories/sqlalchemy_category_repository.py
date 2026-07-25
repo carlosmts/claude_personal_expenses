@@ -33,3 +33,22 @@ class SqlAlchemyCategoryRepository(CategoryRepository):
     async def get_by_id(self, category_id: int) -> Category | None:
         model = await self._session.get(CategoryModel, category_id)
         return _to_domain(model) if model else None
+
+    async def update(self, category: Category) -> Category:
+        model = await self._session.get(CategoryModel, category.id)
+        assert model is not None, "update() requires an existing category id"
+
+        model.name = category.name
+
+        await self._session.flush()
+        await self._session.refresh(model)
+        return _to_domain(model)
+
+    async def delete(self, category_id: int) -> bool:
+        model = await self._session.get(CategoryModel, category_id)
+        if model is None:
+            return False
+
+        await self._session.delete(model)
+        await self._session.flush()
+        return True

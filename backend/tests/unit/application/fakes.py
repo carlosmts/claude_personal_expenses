@@ -30,6 +30,20 @@ class FakeCategoryRepository(CategoryRepository):
     async def get_by_id(self, category_id: int) -> Category | None:
         return next((c for c in self._categories if c.id == category_id), None)
 
+    async def update(self, category: Category) -> Category:
+        index = next(i for i, c in enumerate(self._categories) if c.id == category.id)
+        self._categories[index] = category
+        return category
+
+    async def delete(self, category_id: int) -> bool:
+        index = next(
+            (i for i, c in enumerate(self._categories) if c.id == category_id), None
+        )
+        if index is None:
+            return False
+        del self._categories[index]
+        return True
+
 
 class FakeUserRepository(UserRepository):
     def __init__(self, users: list[User] | None = None) -> None:
@@ -40,6 +54,11 @@ class FakeUserRepository(UserRepository):
 
     async def get_by_id(self, user_id: int) -> User | None:
         return next((u for u in self._users if u.id == user_id), None)
+
+    async def update(self, user: User) -> User:
+        index = next(i for i, u in enumerate(self._users) if u.id == user.id)
+        self._users[index] = user
+        return user
 
 
 class FakeTransactionRepository(TransactionRepository):
@@ -80,6 +99,9 @@ class FakeTransactionRepository(TransactionRepository):
             return False
         del self._transactions[index]
         return True
+
+    async def exists_for_category(self, category_id: int) -> bool:
+        return any(t.category_id == category_id for t in self._transactions)
 
 
 class FakeSummaryRepository(SummaryRepository):

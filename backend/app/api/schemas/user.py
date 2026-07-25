@@ -1,6 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.domain.entities.user import User
+
+
+class UserUpdateRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
 
 
 class UserResponse(BaseModel):

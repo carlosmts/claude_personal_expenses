@@ -71,3 +71,9 @@ class SqlAlchemyTransactionRepository(TransactionRepository):
         await self._session.delete(model)
         await self._session.flush()
         return True
+
+    async def exists_for_category(self, category_id: int) -> bool:
+        result = await self._session.execute(
+            select(TransactionModel.id).where(TransactionModel.category_id == category_id).limit(1)
+        )
+        return result.first() is not None

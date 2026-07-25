@@ -20,3 +20,6 @@ class TransactionRepository(ABC):
 
     @abstractmethod
     async def delete(self, transaction_id: int) -> bool: ...
+
+    @abstractmethod
+    async def exists_for_category(self, category_id: int) -> bool: ...

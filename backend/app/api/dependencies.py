@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.application.use_cases.create_category import CreateCategoryUseCase
 from app.application.use_cases.create_goal import CreateGoalUseCase
 from app.application.use_cases.create_transaction import CreateTransactionUseCase
+from app.application.use_cases.delete_category import DeleteCategoryUseCase
 from app.application.use_cases.delete_goal import DeleteGoalUseCase
 from app.application.use_cases.delete_transaction import DeleteTransactionUseCase
 from app.application.use_cases.get_monthly_summary import GetMonthlySummaryUseCase
@@ -13,8 +14,10 @@ from app.application.use_cases.list_categories import ListCategoriesUseCase
 from app.application.use_cases.list_goals import ListGoalsUseCase
 from app.application.use_cases.list_transactions import ListTransactionsUseCase
 from app.application.use_cases.list_users import ListUsersUseCase
+from app.application.use_cases.update_category import UpdateCategoryUseCase
 from app.application.use_cases.update_goal import UpdateGoalUseCase
 from app.application.use_cases.update_transaction import UpdateTransactionUseCase
+from app.application.use_cases.update_user import UpdateUserUseCase
 from app.infrastructure.database import get_db_session
 from app.infrastructure.repositories.sqlalchemy_category_repository import (
     SqlAlchemyCategoryRepository,
@@ -70,9 +73,33 @@ def get_list_users_use_case(user_repository: UserRepositoryDep) -> ListUsersUseC
     return ListUsersUseCase(user_repository)
 
 
+def get_update_category_use_case(
+    category_repository: CategoryRepositoryDep,
+) -> UpdateCategoryUseCase:
+    return UpdateCategoryUseCase(category_repository)
+
+
+def get_delete_category_use_case(
+    category_repository: CategoryRepositoryDep,
+    transaction_repository: TransactionRepositoryDep,
+) -> DeleteCategoryUseCase:
+    return DeleteCategoryUseCase(category_repository, transaction_repository)
+
+
+def get_update_user_use_case(user_repository: UserRepositoryDep) -> UpdateUserUseCase:
+    return UpdateUserUseCase(user_repository)
+
+
 CreateCategoryUseCaseDep = Annotated[CreateCategoryUseCase, Depends(get_create_category_use_case)]
 ListCategoriesUseCaseDep = Annotated[ListCategoriesUseCase, Depends(get_list_categories_use_case)]
 ListUsersUseCaseDep = Annotated[ListUsersUseCase, Depends(get_list_users_use_case)]
+UpdateCategoryUseCaseDep = Annotated[
+    UpdateCategoryUseCase, Depends(get_update_category_use_case)
+]
+DeleteCategoryUseCaseDep = Annotated[
+    DeleteCategoryUseCase, Depends(get_delete_category_use_case)
+]
+UpdateUserUseCaseDep = Annotated[UpdateUserUseCase, Depends(get_update_user_use_case)]
 
 
 def get_create_transaction_use_case(
