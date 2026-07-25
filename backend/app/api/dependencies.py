@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.application.use_cases.create_category import CreateCategoryUseCase
 from app.application.use_cases.create_transaction import CreateTransactionUseCase
 from app.application.use_cases.delete_transaction import DeleteTransactionUseCase
+from app.application.use_cases.get_monthly_summary import GetMonthlySummaryUseCase
 from app.application.use_cases.list_categories import ListCategoriesUseCase
 from app.application.use_cases.list_transactions import ListTransactionsUseCase
 from app.application.use_cases.list_users import ListUsersUseCase
@@ -13,6 +14,9 @@ from app.application.use_cases.update_transaction import UpdateTransactionUseCas
 from app.infrastructure.database import get_db_session
 from app.infrastructure.repositories.sqlalchemy_category_repository import (
     SqlAlchemyCategoryRepository,
+)
+from app.infrastructure.repositories.sqlalchemy_summary_repository import (
+    SqlAlchemySummaryRepository,
 )
 from app.infrastructure.repositories.sqlalchemy_transaction_repository import (
     SqlAlchemyTransactionRepository,
@@ -119,4 +123,22 @@ UpdateTransactionUseCaseDep = Annotated[
 ]
 DeleteTransactionUseCaseDep = Annotated[
     DeleteTransactionUseCase, Depends(get_delete_transaction_use_case)
+]
+
+
+def get_summary_repository(session: DbSession) -> SqlAlchemySummaryRepository:
+    return SqlAlchemySummaryRepository(session)
+
+
+SummaryRepositoryDep = Annotated[SqlAlchemySummaryRepository, Depends(get_summary_repository)]
+
+
+def get_monthly_summary_use_case(
+    summary_repository: SummaryRepositoryDep,
+) -> GetMonthlySummaryUseCase:
+    return GetMonthlySummaryUseCase(summary_repository)
+
+
+GetMonthlySummaryUseCaseDep = Annotated[
+    GetMonthlySummaryUseCase, Depends(get_monthly_summary_use_case)
 ]

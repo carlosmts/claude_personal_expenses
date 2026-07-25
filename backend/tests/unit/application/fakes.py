@@ -1,7 +1,9 @@
 from app.domain.entities.category import Category
+from app.domain.entities.summary import MonthlySummary
 from app.domain.entities.transaction import Transaction
 from app.domain.entities.user import User
 from app.domain.repositories.category_repository import CategoryRepository
+from app.domain.repositories.summary_repository import SummaryRepository
 from app.domain.repositories.transaction_repository import TransactionRepository
 from app.domain.repositories.user_repository import UserRepository
 
@@ -76,3 +78,11 @@ class FakeTransactionRepository(TransactionRepository):
             return False
         del self._transactions[index]
         return True
+
+
+class FakeSummaryRepository(SummaryRepository):
+    def __init__(self, summary: MonthlySummary) -> None:
+        self._summary = summary
+
+    async def get_monthly_summary(self, year: int, month: int) -> MonthlySummary:
+        return self._summary
