@@ -8,3 +8,7 @@ extension UserResponseDTO {
         User(id: id, name: name)
     }
 }
+
+struct UserRenameRequestDTO: Encodable {
+    let name: String
+}

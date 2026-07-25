@@ -8,3 +8,7 @@ extension CategoryResponseDTO {
         Category(id: id, name: name)
     }
 }
+
+struct CategoryRenameRequestDTO: Encodable {
+    let name: String
+}

@@ -9,4 +9,16 @@ final class RemoteCategoryRepository: CategoryRepository {
         let dtos: [CategoryResponseDTO] = try await apiClient.get("categories")
         return dtos.map { $0.toDomain() }
     }
+
+    func update(id: Int, name: String) async throws -> Category {
+        let dto: CategoryResponseDTO = try await apiClient.put(
+            "categories/\(id)",
+            body: CategoryRenameRequestDTO(name: name)
+        )
+        return dto.toDomain()
+    }
+
+    func delete(_ id: Int) async throws {
+        try await apiClient.delete("categories/\(id)")
+    }
 }

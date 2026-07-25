@@ -5,13 +5,11 @@ import Foundation
 /// JSON keys are converted snake_case <-> camelCase centrally here, so DTOs
 /// never need hand-written CodingKeys for that.
 final class APIClient {
-    private let baseURL: URL
     private let session: URLSession
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
 
-    init(baseURL: URL, session: URLSession = .shared) {
-        self.baseURL = baseURL
+    init(session: URLSession = .shared) {
         self.session = session
         decoder = Self.makeDecoder()
         encoder = Self.makeEncoder()
@@ -19,7 +17,7 @@ final class APIClient {
 
     func get<Response: Decodable>(_ path: String, queryItems: [URLQueryItem] = []) async throws -> Response {
         var components = URLComponents(
-            url: baseURL.appendingPathComponent(path),
+            url: APIConfiguration.baseURL.appendingPathComponent(path),
             resolvingAgainstBaseURL: false
         )
         if !queryItems.isEmpty {
@@ -41,7 +39,7 @@ final class APIClient {
     }
 
     func delete(_ path: String) async throws {
-        var request = URLRequest(url: baseURL.appendingPathComponent(path))
+        var request = URLRequest(url: APIConfiguration.baseURL.appendingPathComponent(path))
         request.httpMethod = "DELETE"
         _ = try await performRequest(request)
     }
@@ -51,7 +49,7 @@ final class APIClient {
         method: String,
         body: Body
     ) async throws -> Response {
-        var request = URLRequest(url: baseURL.appendingPathComponent(path))
+        var request = URLRequest(url: APIConfiguration.baseURL.appendingPathComponent(path))
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try encoder.encode(body)
