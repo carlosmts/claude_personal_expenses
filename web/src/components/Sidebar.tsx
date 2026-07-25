@@ -1,4 +1,4 @@
-import { LayoutDashboard, PieChart, Receipt, Settings as SettingsIcon, Target } from 'lucide-react';
+import { LayoutDashboard, Menu, PieChart, Receipt, Settings as SettingsIcon, Target } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 const NAV_ITEMS = [
@@ -9,24 +9,44 @@ const NAV_ITEMS = [
   { to: '/settings', label: 'Settings', icon: SettingsIcon, end: false },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
+}
+
+export function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
   return (
-    <nav className="flex h-screen w-60 shrink-0 flex-col bg-indigo-700 px-4 py-6 text-white">
-      <div className="mb-8 px-2 text-xl font-bold">Expense Tracker</div>
+    <nav
+      className={`sticky top-0 flex h-screen shrink-0 flex-col bg-indigo-700 py-6 text-white transition-all ${
+        collapsed ? 'w-20 px-2' : 'w-60 px-4'
+      }`}
+    >
+      <div className={`mb-8 flex items-center ${collapsed ? 'justify-center' : 'justify-between px-2'}`}>
+        {!collapsed && <span className="truncate text-xl font-bold">Expense Tracker</span>}
+        <button
+          type="button"
+          onClick={onToggleCollapsed}
+          className="shrink-0 rounded-lg p-1.5 text-indigo-100 hover:bg-white/10"
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          <Menu size={20} />
+        </button>
+      </div>
       <ul className="flex flex-col gap-1">
         {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
           <li key={to}>
             <NavLink
               to={to}
               end={end}
+              title={collapsed ? label : undefined}
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive ? 'bg-white/15 text-white' : 'text-indigo-100 hover:bg-white/10'
-                }`
+                  collapsed ? 'justify-center' : ''
+                } ${isActive ? 'bg-white/15 text-white' : 'text-indigo-100 hover:bg-white/10'}`
               }
             >
               <Icon size={18} />
-              {label}
+              {!collapsed && label}
             </NavLink>
           </li>
         ))}
