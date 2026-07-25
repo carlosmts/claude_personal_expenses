@@ -1,15 +1,34 @@
 import SwiftUI
 
-struct AddTransactionView: View {
+/// Shared form for both creating a new transaction and editing an existing
+/// one — the only difference is which fields are prefilled and which
+/// repository call `save()` makes.
+struct TransactionFormView: View {
     @ObservedObject var viewModel: TransactionsViewModel
     @Environment(\.dismiss) private var dismiss
 
-    @State private var date = Date()
-    @State private var type: TransactionType = .expense
-    @State private var amountText = ""
-    @State private var categoryName = ""
-    @State private var description = ""
+    /// Non-nil when editing an existing transaction; nil when creating a new one.
+    private let editingTransaction: Transaction?
+
+    @State private var date: Date
+    @State private var type: TransactionType
+    @State private var amountText: String
+    @State private var categoryName: String
+    @State private var description: String
     @State private var selectedUserId: Int?
+
+    init(viewModel: TransactionsViewModel, editingTransaction: Transaction? = nil) {
+        self.viewModel = viewModel
+        self.editingTransaction = editingTransaction
+        _date = State(initialValue: editingTransaction?.date ?? Date())
+        _type = State(initialValue: editingTransaction?.type ?? .expense)
+        _amountText = State(
+            initialValue: editingTransaction.map { Self.formattedAmount($0.amount) } ?? ""
+        )
+        _categoryName = State(initialValue: editingTransaction?.categoryName ?? "")
+        _description = State(initialValue: editingTransaction?.description ?? "")
+        _selectedUserId = State(initialValue: editingTransaction?.userId)
+    }
 
     var body: some View {
         NavigationStack {
@@ -42,7 +61,7 @@ struct AddTransactionView: View {
                     .pickerStyle(.segmented)
                 }
             }
-            .navigationTitle("Add Transaction")
+            .navigationTitle(editingTransaction == nil ? "Add Transaction" : "Edit Transaction")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -85,8 +104,24 @@ struct AddTransactionView: View {
             description: description.isEmpty ? nil : description
         )
 
-        if await viewModel.addTransaction(input) {
+        let success: Bool
+        if let editingTransaction {
+            success = await viewModel.updateTransaction(id: editingTransaction.id, input: input)
+        } else {
+            success = await viewModel.addTransaction(input)
+        }
+
+        if success {
             dismiss()
         }
+    }
+
+    private static func formattedAmount(_ amount: Decimal) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.locale = .current
+        formatter.minimumFractionDigits = 2
+        formatter.maximumFractionDigits = 2
+        return formatter.string(from: NSDecimalNumber(decimal: amount)) ?? "\(amount)"
     }
 }

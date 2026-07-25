@@ -14,4 +14,13 @@ final class RemoteTransactionRepository: TransactionRepository {
         let dto: TransactionResponseDTO = try await apiClient.post("transactions", body: input.toDTO())
         return try dto.toDomain()
     }
+
+    func update(id: Int, input: NewTransactionInput) async throws -> Transaction {
+        let dto: TransactionResponseDTO = try await apiClient.put("transactions/\(id)", body: input.toDTO())
+        return try dto.toDomain()
+    }
+
+    func delete(_ id: Int) async throws {
+        try await apiClient.delete("transactions/\(id)")
+    }
 }
