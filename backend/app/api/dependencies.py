@@ -4,16 +4,23 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.use_cases.create_category import CreateCategoryUseCase
+from app.application.use_cases.create_goal import CreateGoalUseCase
 from app.application.use_cases.create_transaction import CreateTransactionUseCase
+from app.application.use_cases.delete_goal import DeleteGoalUseCase
 from app.application.use_cases.delete_transaction import DeleteTransactionUseCase
 from app.application.use_cases.get_monthly_summary import GetMonthlySummaryUseCase
 from app.application.use_cases.list_categories import ListCategoriesUseCase
+from app.application.use_cases.list_goals import ListGoalsUseCase
 from app.application.use_cases.list_transactions import ListTransactionsUseCase
 from app.application.use_cases.list_users import ListUsersUseCase
+from app.application.use_cases.update_goal import UpdateGoalUseCase
 from app.application.use_cases.update_transaction import UpdateTransactionUseCase
 from app.infrastructure.database import get_db_session
 from app.infrastructure.repositories.sqlalchemy_category_repository import (
     SqlAlchemyCategoryRepository,
+)
+from app.infrastructure.repositories.sqlalchemy_goal_repository import (
+    SqlAlchemyGoalRepository,
 )
 from app.infrastructure.repositories.sqlalchemy_summary_repository import (
     SqlAlchemySummaryRepository,
@@ -142,3 +149,41 @@ def get_monthly_summary_use_case(
 GetMonthlySummaryUseCaseDep = Annotated[
     GetMonthlySummaryUseCase, Depends(get_monthly_summary_use_case)
 ]
+
+
+def get_goal_repository(session: DbSession) -> SqlAlchemyGoalRepository:
+    return SqlAlchemyGoalRepository(session)
+
+
+GoalRepositoryDep = Annotated[SqlAlchemyGoalRepository, Depends(get_goal_repository)]
+
+
+def get_create_goal_use_case(
+    goal_repository: GoalRepositoryDep,
+    user_repository: UserRepositoryDep,
+) -> CreateGoalUseCase:
+    return CreateGoalUseCase(goal_repository, user_repository)
+
+
+def get_list_goals_use_case(
+    goal_repository: GoalRepositoryDep,
+    user_repository: UserRepositoryDep,
+) -> ListGoalsUseCase:
+    return ListGoalsUseCase(goal_repository, user_repository)
+
+
+def get_update_goal_use_case(
+    goal_repository: GoalRepositoryDep,
+    user_repository: UserRepositoryDep,
+) -> UpdateGoalUseCase:
+    return UpdateGoalUseCase(goal_repository, user_repository)
+
+
+def get_delete_goal_use_case(goal_repository: GoalRepositoryDep) -> DeleteGoalUseCase:
+    return DeleteGoalUseCase(goal_repository)
+
+
+CreateGoalUseCaseDep = Annotated[CreateGoalUseCase, Depends(get_create_goal_use_case)]
+ListGoalsUseCaseDep = Annotated[ListGoalsUseCase, Depends(get_list_goals_use_case)]
+UpdateGoalUseCaseDep = Annotated[UpdateGoalUseCase, Depends(get_update_goal_use_case)]
+DeleteGoalUseCaseDep = Annotated[DeleteGoalUseCase, Depends(get_delete_goal_use_case)]

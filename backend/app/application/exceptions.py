@@ -4,3 +4,7 @@ class UserNotFoundError(Exception):
 
 class TransactionNotFoundError(Exception):
     """Raised when looking up, updating, or deleting a transaction that does not exist."""
+
+
+class GoalNotFoundError(Exception):
+    """Raised when looking up, updating, or deleting a goal that does not exist."""

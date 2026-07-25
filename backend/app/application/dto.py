@@ -3,6 +3,7 @@ from datetime import date as date_
 from decimal import Decimal
 
 from app.domain.entities.category import Category
+from app.domain.entities.goal import Goal
 from app.domain.entities.transaction import Transaction, TransactionType
 from app.domain.entities.user import User
 
@@ -47,4 +48,38 @@ class TransactionDetail:
             category_name=category.name,
             user_id=user.id,
             user_name=user.name,
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class GoalInput:
+    user_id: int
+    name: str
+    target_amount: Decimal
+    current_amount: Decimal = Decimal("0")
+
+
+@dataclass(frozen=True, slots=True)
+class GoalDetail:
+    """Read model for a persisted goal, enriched with the owning user's name."""
+
+    id: int
+    user_id: int
+    user_name: str
+    name: str
+    target_amount: Decimal
+    current_amount: Decimal
+
+    @classmethod
+    def from_parts(cls, goal: Goal, user: User) -> "GoalDetail":
+        assert goal.id is not None, "persisted goal must have an id"
+        assert user.id is not None, "persisted user must have an id"
+
+        return cls(
+            id=goal.id,
+            user_id=user.id,
+            user_name=user.name,
+            name=goal.name,
+            target_amount=goal.target_amount,
+            current_amount=goal.current_amount,
         )

@@ -1,8 +1,10 @@
 from app.domain.entities.category import Category
+from app.domain.entities.goal import Goal
 from app.domain.entities.summary import MonthlySummary
 from app.domain.entities.transaction import Transaction
 from app.domain.entities.user import User
 from app.domain.repositories.category_repository import CategoryRepository
+from app.domain.repositories.goal_repository import GoalRepository
 from app.domain.repositories.summary_repository import SummaryRepository
 from app.domain.repositories.transaction_repository import TransactionRepository
 from app.domain.repositories.user_repository import UserRepository
@@ -86,3 +88,39 @@ class FakeSummaryRepository(SummaryRepository):
 
     async def get_monthly_summary(self, year: int, month: int) -> MonthlySummary:
         return self._summary
+
+
+class FakeGoalRepository(GoalRepository):
+    def __init__(self) -> None:
+        self._goals: list[Goal] = []
+        self._next_id = 1
+
+    async def add(self, goal: Goal) -> Goal:
+        persisted = Goal(
+            id=self._next_id,
+            user_id=goal.user_id,
+            name=goal.name,
+            target_amount=goal.target_amount,
+            current_amount=goal.current_amount,
+        )
+        self._next_id += 1
+        self._goals.append(persisted)
+        return persisted
+
+    async def list_all(self) -> list[Goal]:
+        return list(self._goals)
+
+    async def get_by_id(self, goal_id: int) -> Goal | None:
+        return next((g for g in self._goals if g.id == goal_id), None)
+
+    async def update(self, goal: Goal) -> Goal:
+        index = next(i for i, g in enumerate(self._goals) if g.id == goal.id)
+        self._goals[index] = goal
+        return goal
+
+    async def delete(self, goal_id: int) -> bool:
+        index = next((i for i, g in enumerate(self._goals) if g.id == goal_id), None)
+        if index is None:
+            return False
+        del self._goals[index]
+        return True
