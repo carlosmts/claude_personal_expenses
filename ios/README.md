@@ -11,8 +11,9 @@ ExpenseTracker/Sources/
 ```
 
 The `.xcodeproj` is **generated, not committed** — `project.yml` is the source
-of truth. Regenerate any time you change `project.yml` (adding new files under
-`Sources/` does *not* require regenerating).
+of truth. **Run `xcodegen generate` again after pulling any change that adds,
+renames, or removes Swift files** — the generated project lists files
+explicitly, so new files silently won't be compiled until you regenerate.
 
 ## One-time setup
 

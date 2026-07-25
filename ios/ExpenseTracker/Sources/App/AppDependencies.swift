@@ -5,14 +5,22 @@ import Foundation
 final class AppDependencies {
     private let apiClient: APIClient
     private let transactionRepository: TransactionRepository
+    private let categoryRepository: CategoryRepository
+    private let userRepository: UserRepository
 
     init() {
         apiClient = APIClient(baseURL: APIConfiguration.baseURL)
         transactionRepository = RemoteTransactionRepository(apiClient: apiClient)
+        categoryRepository = RemoteCategoryRepository(apiClient: apiClient)
+        userRepository = RemoteUserRepository(apiClient: apiClient)
     }
 
     @MainActor
     func makeTransactionsViewModel() -> TransactionsViewModel {
-        TransactionsViewModel(transactionRepository: transactionRepository)
+        TransactionsViewModel(
+            transactionRepository: transactionRepository,
+            categoryRepository: categoryRepository,
+            userRepository: userRepository
+        )
     }
 }

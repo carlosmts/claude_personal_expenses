@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TransactionsView: View {
     @StateObject private var viewModel: TransactionsViewModel
+    @State private var isPresentingAddTransaction = false
 
     init(viewModel: TransactionsViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -28,6 +29,18 @@ struct TransactionsView: View {
                 }
             }
             .navigationTitle("Transactions")
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        isPresentingAddTransaction = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                }
+            }
+            .sheet(isPresented: $isPresentingAddTransaction) {
+                AddTransactionView(viewModel: viewModel)
+            }
             .alert(
                 "Something went wrong",
                 isPresented: .constant(viewModel.errorMessage != nil),

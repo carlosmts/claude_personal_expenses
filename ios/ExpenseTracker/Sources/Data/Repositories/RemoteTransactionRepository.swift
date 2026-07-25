@@ -9,4 +9,9 @@ final class RemoteTransactionRepository: TransactionRepository {
         let dtos: [TransactionResponseDTO] = try await apiClient.get("transactions")
         return try dtos.map { try $0.toDomain() }
     }
+
+    func create(_ input: NewTransactionInput) async throws -> Transaction {
+        let dto: TransactionResponseDTO = try await apiClient.post("transactions", body: input.toDTO())
+        return try dto.toDomain()
+    }
 }
