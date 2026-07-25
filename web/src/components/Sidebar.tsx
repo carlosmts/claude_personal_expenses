@@ -1,0 +1,36 @@
+import { LayoutDashboard, PieChart, Receipt, Settings as SettingsIcon, Target } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+
+const NAV_ITEMS = [
+  { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
+  { to: '/transactions', label: 'Transactions', icon: Receipt, end: false },
+  { to: '/report', label: 'Report', icon: PieChart, end: false },
+  { to: '/plan', label: 'Plan', icon: Target, end: false },
+  { to: '/settings', label: 'Settings', icon: SettingsIcon, end: false },
+];
+
+export function Sidebar() {
+  return (
+    <nav className="flex h-screen w-60 shrink-0 flex-col bg-indigo-700 px-4 py-6 text-white">
+      <div className="mb-8 px-2 text-xl font-bold">Expense Tracker</div>
+      <ul className="flex flex-col gap-1">
+        {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
+          <li key={to}>
+            <NavLink
+              to={to}
+              end={end}
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
+                  isActive ? 'bg-white/15 text-white' : 'text-indigo-100 hover:bg-white/10'
+                }`
+              }
+            >
+              <Icon size={18} />
+              {label}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}

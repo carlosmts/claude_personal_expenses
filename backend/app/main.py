@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routers import categories, goals, summary, transactions, users
 from app.core.config import get_settings
@@ -12,6 +13,17 @@ def create_app() -> FastAPI:
         title="Expense Tracker API",
         version="0.1.0",
         debug=settings.environment == "development",
+    )
+
+    # No cookies/credentials are used (no auth yet), so a wide-open origin
+    # policy is safe for this private, non-public app — avoids needing to
+    # track every dev machine's LAN IP/port as an explicit allowed origin.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     @app.get("/health")

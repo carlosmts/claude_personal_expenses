@@ -31,6 +31,13 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
+      # Keeps the container's Linux .venv in a separate Docker-managed
+      # volume instead of the bind-mounted source folder — otherwise it
+      # collides with the host's own macOS .venv (created by running
+      # `uv run` directly on the host for tests/mypy) and repeatedly
+      # corrupts each other's platform-specific virtualenv.
+      - backend_venv:/app/.venv
 
 volumes:
   postgres_data:
+  backend_venv:
