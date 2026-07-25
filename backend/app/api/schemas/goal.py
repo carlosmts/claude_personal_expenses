@@ -6,7 +6,7 @@ from app.application.dto import GoalDetail
 
 
 class GoalCreateRequest(BaseModel):
-    user_id: int
+    user_id: int | None = None
     name: str = Field(min_length=1, max_length=100)
     target_amount: Decimal = Field(gt=0)
     current_amount: Decimal = Field(default=Decimal("0"), ge=0)
@@ -14,7 +14,7 @@ class GoalCreateRequest(BaseModel):
 
 class GoalResponse(BaseModel):
     id: int
-    user_id: int
+    user_id: int | None
     user_name: str
     name: str
     target_amount: Decimal

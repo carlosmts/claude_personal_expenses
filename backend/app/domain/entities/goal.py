@@ -4,7 +4,10 @@ from decimal import Decimal
 
 @dataclass(frozen=True, slots=True)
 class Goal:
-    user_id: int
+    """A savings goal. user_id is None for a shared/household goal (not
+    owned by one person)."""
+
+    user_id: int | None
     name: str
     target_amount: Decimal
     current_amount: Decimal = Decimal("0")

@@ -1,5 +1,5 @@
 from app.application.dto import GoalDetail, GoalInput
-from app.application.exceptions import UserNotFoundError
+from app.application.use_cases._shared import resolve_optional_user
 from app.domain.entities.goal import Goal
 from app.domain.repositories.goal_repository import GoalRepository
 from app.domain.repositories.user_repository import UserRepository
@@ -11,9 +11,7 @@ class CreateGoalUseCase:
         self._user_repository = user_repository
 
     async def execute(self, input_data: GoalInput) -> GoalDetail:
-        user = await self._user_repository.get_by_id(input_data.user_id)
-        if user is None:
-            raise UserNotFoundError(f"User {input_data.user_id} does not exist")
+        user = await resolve_optional_user(input_data.user_id, self._user_repository)
 
         goal = await self._goal_repository.add(
             Goal(

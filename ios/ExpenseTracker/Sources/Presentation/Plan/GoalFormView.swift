@@ -1,5 +1,13 @@
 import SwiftUI
 
+/// Distinguishes "no owner chosen yet" (the Optional wrapping this enum is
+/// nil) from "explicitly chose Both" (.both) — a plain `Int?` can't tell
+/// those apart, since both would otherwise just be nil.
+private enum GoalOwnerSelection: Hashable {
+    case user(Int)
+    case both
+}
+
 /// Shared form for both creating a new goal and editing an existing one —
 /// mirrors TransactionFormView's add/edit pattern.
 struct GoalFormView: View {
@@ -11,7 +19,7 @@ struct GoalFormView: View {
     @State private var name: String
     @State private var targetAmountText: String
     @State private var currentAmountText: String
-    @State private var selectedUserId: Int?
+    @State private var selectedOwner: GoalOwnerSelection?
 
     init(viewModel: PlanViewModel, editingGoal: Goal? = nil) {
         self.viewModel = viewModel
@@ -23,7 +31,11 @@ struct GoalFormView: View {
         _currentAmountText = State(
             initialValue: editingGoal.map { Self.formattedAmount($0.currentAmount) } ?? "0"
         )
-        _selectedUserId = State(initialValue: editingGoal?.userId)
+        _selectedOwner = State(
+            initialValue: editingGoal.map { goal in
+                goal.userId.map { GoalOwnerSelection.user($0) } ?? .both
+            }
+        )
     }
 
     var body: some View {
@@ -38,10 +50,11 @@ struct GoalFormView: View {
                 }
 
                 Section("Whose goal is this?") {
-                    Picker("Person", selection: $selectedUserId) {
+                    Picker("Person", selection: $selectedOwner) {
                         ForEach(viewModel.users) { user in
-                            Text(user.name).tag(Optional(user.id))
+                            Text(user.name).tag(Optional(GoalOwnerSelection.user(user.id)))
                         }
+                        Text("Both").tag(Optional(GoalOwnerSelection.both))
                     }
                     .pickerStyle(.segmented)
                 }
@@ -73,12 +86,20 @@ struct GoalFormView: View {
         guard !name.trimmingCharacters(in: .whitespaces).isEmpty else { return false }
         guard let target = parsedTarget, target > 0 else { return false }
         guard let current = parsedCurrent, current >= 0 else { return false }
-        return selectedUserId != nil
+        return selectedOwner != nil
     }
 
     private func save() async {
-        guard let target = parsedTarget, let current = parsedCurrent, let userId = selectedUserId else {
+        guard let target = parsedTarget, let current = parsedCurrent, let owner = selectedOwner else {
             return
+        }
+
+        let userId: Int?
+        switch owner {
+        case let .user(id):
+            userId = id
+        case .both:
+            userId = nil
         }
 
         let input = GoalInput(

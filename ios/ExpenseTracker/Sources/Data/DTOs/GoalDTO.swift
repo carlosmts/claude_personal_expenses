@@ -5,7 +5,7 @@ import Foundation
 /// JSON string, not a JSON number.
 struct GoalResponseDTO: Decodable {
     let id: Int
-    let userId: Int
+    let userId: Int?
     let userName: String
     let name: String
     let targetAmount: String
@@ -32,7 +32,7 @@ extension GoalResponseDTO {
 }
 
 struct GoalRequestDTO: Encodable {
-    let userId: Int
+    let userId: Int?
     let name: String
     let targetAmount: String
     let currentAmount: String

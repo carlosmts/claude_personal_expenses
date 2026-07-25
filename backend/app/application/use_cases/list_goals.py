@@ -11,4 +11,7 @@ class ListGoalsUseCase:
     async def execute(self) -> list[GoalDetail]:
         goals = await self._goal_repository.list_all()
         users_by_id = {user.id: user for user in await self._user_repository.list_all()}
-        return [GoalDetail.from_parts(goal, users_by_id[goal.user_id]) for goal in goals]
+        return [
+            GoalDetail.from_parts(goal, users_by_id.get(goal.user_id) if goal.user_id is not None else None)
+            for goal in goals
+        ]

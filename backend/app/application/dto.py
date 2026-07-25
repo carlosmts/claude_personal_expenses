@@ -53,7 +53,7 @@ class TransactionDetail:
 
 @dataclass(frozen=True, slots=True)
 class GoalInput:
-    user_id: int
+    user_id: int | None
     name: str
     target_amount: Decimal
     current_amount: Decimal = Decimal("0")
@@ -61,24 +61,28 @@ class GoalInput:
 
 @dataclass(frozen=True, slots=True)
 class GoalDetail:
-    """Read model for a persisted goal, enriched with the owning user's name."""
+    """Read model for a persisted goal, enriched with the owning user's name.
+
+    user_id/user_name are None/"Both" for a shared goal.
+    """
 
     id: int
-    user_id: int
+    user_id: int | None
     user_name: str
     name: str
     target_amount: Decimal
     current_amount: Decimal
 
     @classmethod
-    def from_parts(cls, goal: Goal, user: User) -> "GoalDetail":
+    def from_parts(cls, goal: Goal, user: User | None) -> "GoalDetail":
         assert goal.id is not None, "persisted goal must have an id"
-        assert user.id is not None, "persisted user must have an id"
+        if user is not None:
+            assert user.id is not None, "persisted user must have an id"
 
         return cls(
             id=goal.id,
-            user_id=user.id,
-            user_name=user.name,
+            user_id=user.id if user is not None else None,
+            user_name=user.name if user is not None else "Both",
             name=goal.name,
             target_amount=goal.target_amount,
             current_amount=goal.current_amount,

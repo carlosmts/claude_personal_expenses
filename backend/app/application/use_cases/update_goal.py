@@ -1,5 +1,6 @@
 from app.application.dto import GoalDetail, GoalInput
-from app.application.exceptions import GoalNotFoundError, UserNotFoundError
+from app.application.exceptions import GoalNotFoundError
+from app.application.use_cases._shared import resolve_optional_user
 from app.domain.entities.goal import Goal
 from app.domain.repositories.goal_repository import GoalRepository
 from app.domain.repositories.user_repository import UserRepository
@@ -15,9 +16,7 @@ class UpdateGoalUseCase:
         if existing is None:
             raise GoalNotFoundError(f"Goal {goal_id} does not exist")
 
-        user = await self._user_repository.get_by_id(input_data.user_id)
-        if user is None:
-            raise UserNotFoundError(f"User {input_data.user_id} does not exist")
+        user = await resolve_optional_user(input_data.user_id, self._user_repository)
 
         goal = await self._goal_repository.update(
             Goal(

@@ -22,6 +22,17 @@ async def test_creates_goal_for_existing_user() -> None:
     assert detail.current_amount == Decimal("0")
 
 
+async def test_creates_shared_goal_when_user_id_is_none() -> None:
+    use_case = CreateGoalUseCase(FakeGoalRepository(), FakeUserRepository([]))
+
+    detail = await use_case.execute(
+        GoalInput(user_id=None, name="House by the Sea", target_amount=Decimal("50000.00"))
+    )
+
+    assert detail.user_id is None
+    assert detail.user_name == "Both"
+
+
 async def test_raises_when_user_does_not_exist() -> None:
     use_case = CreateGoalUseCase(FakeGoalRepository(), FakeUserRepository([]))
 
