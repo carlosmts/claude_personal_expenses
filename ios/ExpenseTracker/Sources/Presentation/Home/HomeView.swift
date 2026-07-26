@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Which form sheet is presented, and with what data — a single piece of
 /// state driving one `.sheet(item:)` instead of separate add/edit sheets.
-private enum TransactionFormMode: Identifiable {
+private enum TransactionFormMode: Identifiable, Equatable {
     case add
     case edit(Transaction)
 
@@ -18,11 +18,13 @@ private enum TransactionFormMode: Identifiable {
 
 struct HomeView: View {
     @StateObject private var viewModel: TransactionsViewModel
+    @StateObject private var dashboardViewModel: DashboardViewModel
     @State private var formMode: TransactionFormMode?
     @State private var pendingDeleteOffsets: IndexSet?
 
-    init(viewModel: TransactionsViewModel) {
+    init(viewModel: TransactionsViewModel, dashboardViewModel: DashboardViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        _dashboardViewModel = StateObject(wrappedValue: dashboardViewModel)
     }
 
     var body: some View {
@@ -33,21 +35,73 @@ struct HomeView: View {
                 } else {
                     List {
                         Section {
-                            BalanceCardView(balance: totalBalance)
+                            if !dashboardViewModel.users.isEmpty {
+                                Picker("Person", selection: $dashboardViewModel.selectedUserId) {
+                                    Text("All").tag(Optional<Int>.none)
+                                    ForEach(dashboardViewModel.users) { user in
+                                        Text(user.name).tag(Optional(user.id))
+                                    }
+                                }
+                                .pickerStyle(.segmented)
+                                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 12, trailing: 0))
+                                .listRowBackground(Color.clear)
+                                .listRowSeparator(.hidden)
+                            }
+
+                            if let summary = dashboardViewModel.summary {
+                                BalanceCardView(
+                                    balance: summary.allTimeIncome - summary.allTimeExpense,
+                                    growthVsLastMonth: percentChange(
+                                        current: summary.currentMonthIncome - summary.currentMonthExpense,
+                                        previous: summary.previousMonthIncome - summary.previousMonthExpense
+                                    )
+                                )
                                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 12, trailing: 0))
                                 .listRowBackground(Color.clear)
                                 .listRowSeparator(.hidden)
 
-                            HStack(spacing: 12) {
-                                StatTileView(title: "Income (this month)", amount: monthlyIncome, tintColor: Theme.income)
-                                StatTileView(title: "Expenses (this month)", amount: monthlyExpenses, tintColor: Theme.expense)
+                                HStack(spacing: 12) {
+                                    StatTileView(
+                                        title: "Income (this month)",
+                                        amount: summary.currentMonthIncome,
+                                        tintColor: Theme.income,
+                                        growthPercent: percentChange(
+                                            current: summary.currentMonthIncome,
+                                            previous: summary.previousMonthIncome
+                                        ),
+                                        positiveIsGood: true
+                                    )
+                                    StatTileView(
+                                        title: "Expenses (this month)",
+                                        amount: summary.currentMonthExpense,
+                                        tintColor: Theme.expense,
+                                        growthPercent: percentChange(
+                                            current: summary.currentMonthExpense,
+                                            previous: summary.previousMonthExpense
+                                        ),
+                                        positiveIsGood: false
+                                    )
+                                }
+                                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 12, trailing: 0))
+                                .listRowBackground(Color.clear)
+                                .listRowSeparator(.hidden)
+
+                                MonthlyBarChartView(breakdown: summary.monthlyBreakdown)
+                                    .frame(height: 220)
+                                    .padding()
+                                    .cardStyle()
+                                    .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                                    .listRowBackground(Color.clear)
+                                    .listRowSeparator(.hidden)
+                            } else if dashboardViewModel.isLoading {
+                                ProgressView()
+                                    .frame(maxWidth: .infinity)
+                                    .listRowBackground(Color.clear)
+                                    .listRowSeparator(.hidden)
                             }
-                            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 12, trailing: 0))
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
                         }
 
-                        if viewModel.transactions.isEmpty {
+                        if filteredTransactions.isEmpty {
                             Section {
                                 ContentUnavailableView(
                                     "No Transactions Yet",
@@ -58,7 +112,7 @@ struct HomeView: View {
                             }
                         } else {
                             Section("Transactions") {
-                                ForEach(viewModel.transactions) { transaction in
+                                ForEach(filteredTransactions) { transaction in
                                     Button {
                                         formMode = .edit(transaction)
                                     } label: {
@@ -76,11 +130,13 @@ struct HomeView: View {
                     .scrollContentBackground(.hidden)
                     .background(Theme.pageBackground)
                     .refreshable {
-                        await viewModel.loadTransactions()
+                        async let transactionsReload: Void = viewModel.loadTransactions()
+                        async let dashboardReload: Void = dashboardViewModel.load()
+                        _ = await (transactionsReload, dashboardReload)
                     }
                 }
             }
-            .navigationTitle("Home")
+            .navigationTitle("Dashboard")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
@@ -98,6 +154,11 @@ struct HomeView: View {
                     TransactionFormView(viewModel: viewModel, editingTransaction: transaction)
                 }
             }
+            .onChange(of: formMode) { _, newValue in
+                if newValue == nil {
+                    Task { await dashboardViewModel.loadSummary() }
+                }
+            }
             .alert(
                 "Delete Transaction?",
                 isPresented: Binding(
@@ -110,6 +171,7 @@ struct HomeView: View {
                     Button("Delete", role: .destructive) {
                         if let offsets = pendingDeleteOffsets {
                             viewModel.deleteTransactions(at: offsets)
+                            Task { await dashboardViewModel.loadSummary() }
                         }
                         pendingDeleteOffsets = nil
                     }
@@ -122,38 +184,21 @@ struct HomeView: View {
                 }
             )
             .errorAlert($viewModel.errorMessage)
+            .errorAlert($dashboardViewModel.errorMessage)
         }
         .task {
             await viewModel.loadTransactions()
         }
-    }
-
-    /// All-time net (every income transaction minus every expense transaction).
-    private var totalBalance: Decimal {
-        viewModel.transactions.reduce(Decimal(0)) { partial, transaction in
-            partial + (transaction.type == .income ? transaction.amount : -transaction.amount)
+        .task {
+            await dashboardViewModel.load()
         }
     }
 
-    /// Simple client-side filter for "this calendar month" — a stopgap until
-    /// the backend's monthly aggregation endpoint lands for the Report tab.
-    private var currentMonthTransactions: [Transaction] {
-        let calendar = Calendar.current
-        let now = Date()
-        return viewModel.transactions.filter {
-            calendar.isDate($0.date, equalTo: now, toGranularity: .month)
+    /// Transactions filtered by the dashboard's person picker — nil selection means "All".
+    private var filteredTransactions: [Transaction] {
+        guard let selectedUserId = dashboardViewModel.selectedUserId else {
+            return viewModel.transactions
         }
-    }
-
-    private var monthlyIncome: Decimal {
-        currentMonthTransactions
-            .filter { $0.type == .income }
-            .reduce(Decimal(0)) { $0 + $1.amount }
-    }
-
-    private var monthlyExpenses: Decimal {
-        currentMonthTransactions
-            .filter { $0.type == .expense }
-            .reduce(Decimal(0)) { $0 + $1.amount }
+        return viewModel.transactions.filter { $0.userId == selectedUserId }
     }
 }

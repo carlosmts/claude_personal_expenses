@@ -7,8 +7,11 @@ struct RootView: View {
 
     var body: some View {
         TabView {
-            HomeView(viewModel: dependencies.makeTransactionsViewModel())
-                .tabItem { Label("Home", systemImage: "house.fill") }
+            HomeView(
+                viewModel: dependencies.makeTransactionsViewModel(),
+                dashboardViewModel: dependencies.makeDashboardViewModel()
+            )
+            .tabItem { Label("Dashboard", systemImage: "house.fill") }
 
             ReportView(viewModel: dependencies.makeReportViewModel())
                 .tabItem { Label("Report", systemImage: "chart.pie.fill") }
