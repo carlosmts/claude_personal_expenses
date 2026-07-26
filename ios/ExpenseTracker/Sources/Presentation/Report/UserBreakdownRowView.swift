@@ -20,11 +20,11 @@ struct UserBreakdownRowView: View {
 
             Text(CurrencyFormatter.string(from: netAmount))
                 .font(.subheadline.bold())
-                .foregroundStyle(netAmount >= 0 ? .green : .red)
+                .foregroundStyle(netAmount >= 0 ? Theme.income : Theme.expense)
         }
         .padding(12)
         .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.cardCornerRadius))
     }
 
     private var netAmount: Decimal {

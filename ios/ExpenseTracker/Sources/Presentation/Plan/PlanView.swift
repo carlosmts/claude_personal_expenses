@@ -97,16 +97,7 @@ struct PlanView: View {
                     Text("This can't be undone.")
                 }
             )
-            .alert(
-                "Something went wrong",
-                isPresented: .constant(viewModel.errorMessage != nil),
-                actions: {
-                    Button("OK") { viewModel.errorMessage = nil }
-                },
-                message: {
-                    Text(viewModel.errorMessage ?? "")
-                }
-            )
+            .errorAlert($viewModel.errorMessage)
         }
         .task {
             await viewModel.load()

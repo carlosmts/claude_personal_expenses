@@ -19,6 +19,7 @@ struct RootView: View {
             SettingsView(viewModel: dependencies.makeSettingsViewModel())
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
         }
+        .tint(Theme.brandPrimary)
         .preferredColorScheme(
             (AppearancePreference(rawValue: appearanceRawValue) ?? .system).colorScheme
         )

@@ -39,8 +39,8 @@ struct HomeView: View {
                                 .listRowSeparator(.hidden)
 
                             HStack(spacing: 12) {
-                                StatTileView(title: "Income (this month)", amount: monthlyIncome, tintColor: .green)
-                                StatTileView(title: "Expenses (this month)", amount: monthlyExpenses, tintColor: .red)
+                                StatTileView(title: "Income (this month)", amount: monthlyIncome, tintColor: Theme.income)
+                                StatTileView(title: "Expenses (this month)", amount: monthlyExpenses, tintColor: Theme.expense)
                             }
                             .listRowInsets(EdgeInsets())
                             .listRowBackground(Color.clear)
@@ -119,16 +119,7 @@ struct HomeView: View {
                     Text("This can't be undone.")
                 }
             )
-            .alert(
-                "Something went wrong",
-                isPresented: .constant(viewModel.errorMessage != nil),
-                actions: {
-                    Button("OK") { viewModel.errorMessage = nil }
-                },
-                message: {
-                    Text(viewModel.errorMessage ?? "")
-                }
-            )
+            .errorAlert($viewModel.errorMessage)
         }
         .task {
             await viewModel.loadTransactions()

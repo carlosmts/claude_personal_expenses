@@ -28,7 +28,7 @@ struct CategoryBreakdownRowView: View {
         }
         .padding(12)
         .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.cardCornerRadius))
     }
 
     private var percentage: Double {

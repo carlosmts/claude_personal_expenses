@@ -11,12 +11,12 @@ struct StatTileView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             Text(CurrencyFormatter.string(from: amount))
-                .font(.title3.bold())
+                .font(Theme.statFont)
                 .foregroundStyle(tintColor)
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.cardCornerRadius))
     }
 }

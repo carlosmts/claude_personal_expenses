@@ -9,7 +9,7 @@ struct GoalRowView: View {
                 Image(systemName: "target")
                     .foregroundStyle(.white)
                     .frame(width: 40, height: 40)
-                    .background(Color.indigo)
+                    .background(Theme.brandPrimary)
                     .clipShape(Circle())
 
                 VStack(alignment: .leading, spacing: 2) {
@@ -32,7 +32,7 @@ struct GoalRowView: View {
             }
 
             ProgressView(value: progress)
-                .tint(.indigo)
+                .tint(Theme.brandPrimary)
 
             Text("\(Int((progress * 100).rounded()))% funded")
                 .font(.caption)
@@ -40,7 +40,7 @@ struct GoalRowView: View {
         }
         .padding(12)
         .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.cardCornerRadius))
     }
 
     private var progress: Double {

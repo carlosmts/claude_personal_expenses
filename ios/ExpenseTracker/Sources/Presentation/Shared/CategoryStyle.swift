@@ -6,25 +6,25 @@ import SwiftUI
 /// this can never be exhaustive.
 enum CategoryStyle {
     private static let styles: [String: (icon: String, color: Color)] = [
-        "groceries": ("cart.fill", .green),
-        "food": ("fork.knife", .orange),
-        "restaurants": ("fork.knife", .orange),
-        "coffee": ("cup.and.saucer.fill", .brown),
-        "salary": ("banknote.fill", .mint),
-        "rent": ("house.fill", .indigo),
-        "housing": ("house.fill", .indigo),
-        "utilities": ("bolt.fill", .yellow),
-        "transport": ("car.fill", .blue),
-        "car": ("car.fill", .blue),
-        "health": ("heart.fill", .red),
-        "entertainment": ("film.fill", .purple),
-        "shopping": ("bag.fill", .pink),
-        "clothing": ("tshirt.fill", .pink),
-        "travel": ("airplane", .cyan),
-        "education": ("graduationcap.fill", .teal),
+        "groceries": ("cart.fill", Color(hex: "22c55e")),
+        "food": ("fork.knife", Color(hex: "f97316")),
+        "restaurants": ("fork.knife", Color(hex: "f97316")),
+        "coffee": ("cup.and.saucer.fill", Color(hex: "a16207")),
+        "salary": ("banknote.fill", Color(hex: "10b981")),
+        "rent": ("house.fill", Color(hex: "6366f1")),
+        "housing": ("house.fill", Color(hex: "6366f1")),
+        "utilities": ("bolt.fill", Color(hex: "eab308")),
+        "transport": ("car.fill", Color(hex: "3b82f6")),
+        "car": ("car.fill", Color(hex: "3b82f6")),
+        "health": ("heart.fill", Color(hex: "ef4444")),
+        "entertainment": ("film.fill", Color(hex: "a855f7")),
+        "shopping": ("bag.fill", Color(hex: "ec4899")),
+        "clothing": ("tshirt.fill", Color(hex: "ec4899")),
+        "travel": ("airplane", Color(hex: "06b6d4")),
+        "education": ("graduationcap.fill", Color(hex: "14b8a6")),
     ]
 
-    private static let fallback = (icon: "tag.fill", color: Color.gray)
+    private static let fallback = (icon: "tag.fill", color: Color(hex: "6b7280"))
 
     static func icon(for categoryName: String) -> String {
         styles[categoryName.lowercased()]?.icon ?? fallback.icon

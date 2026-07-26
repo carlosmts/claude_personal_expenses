@@ -30,7 +30,7 @@ struct TransactionRowView: View {
 
             Text(formattedAmount)
                 .font(.headline)
-                .foregroundStyle(transaction.type == .expense ? .red : .green)
+                .foregroundStyle(transaction.type == .expense ? Theme.expense : Theme.income)
         }
         .padding(.vertical, 4)
     }
