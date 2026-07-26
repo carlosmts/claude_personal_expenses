@@ -37,4 +37,24 @@ enum Theme {
 
     /// Matches the web app's `text-3xl font-bold` big-stat numbers.
     static let statFont = Font.system(size: 30, weight: .bold)
+
+    /// Page background behind floating cards — matches the web's
+    /// `bg-gray-50 dark:bg-gray-900` page background, distinct from the
+    /// white/`secondarySystemGroupedBackground` card fill so cards actually
+    /// read as elevated instead of blending into a plain white background.
+    static let pageBackground = Color(light: "f9fafb", dark: "111827")
+
+    static let cardShadowColor = Color.black.opacity(0.06)
+    static let cardShadowRadius: CGFloat = 6
+    static let cardShadowY: CGFloat = 2
+}
+
+extension View {
+    /// Standard card chrome — adaptive fill, rounded corners, subtle shadow.
+    /// Mirrors the web's `rounded-2xl bg-white shadow-sm dark:bg-gray-800`.
+    func cardStyle() -> some View {
+        background(Color(.secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.cardCornerRadius))
+            .shadow(color: Theme.cardShadowColor, radius: Theme.cardShadowRadius, x: 0, y: Theme.cardShadowY)
+    }
 }

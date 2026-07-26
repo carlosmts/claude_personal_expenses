@@ -39,8 +39,7 @@ struct GoalRowView: View {
                 .foregroundStyle(.secondary)
         }
         .padding(12)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: Theme.cardCornerRadius))
+        .cardStyle()
     }
 
     private var progress: Double {

@@ -44,6 +44,7 @@ struct PlanView: View {
                             }
                             .buttonStyle(.plain)
                             .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                            .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)
                         }
                         .onDelete { offsets in
@@ -51,6 +52,8 @@ struct PlanView: View {
                         }
                     }
                     .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+                    .background(Theme.pageBackground)
                     .refreshable {
                         await viewModel.load()
                     }

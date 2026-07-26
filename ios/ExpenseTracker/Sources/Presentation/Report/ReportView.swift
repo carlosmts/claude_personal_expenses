@@ -76,6 +76,8 @@ struct ReportView: View {
                 } else {
                     CategoryDonutChartView(categories: categories, total: total)
                         .frame(height: 260)
+                        .padding()
+                        .cardStyle()
                         .padding(.horizontal)
 
                     VStack(spacing: 12) {
@@ -103,6 +105,7 @@ struct ReportView: View {
             }
             .padding(.vertical)
         }
+        .background(Theme.pageBackground)
         .refreshable {
             await viewModel.load()
         }

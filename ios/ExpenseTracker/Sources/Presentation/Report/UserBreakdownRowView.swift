@@ -23,8 +23,7 @@ struct UserBreakdownRowView: View {
                 .foregroundStyle(netAmount >= 0 ? Theme.income : Theme.expense)
         }
         .padding(12)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: Theme.cardCornerRadius))
+        .cardStyle()
     }
 
     private var netAmount: Decimal {

@@ -34,7 +34,7 @@ struct HomeView: View {
                     List {
                         Section {
                             BalanceCardView(balance: totalBalance)
-                                .listRowInsets(EdgeInsets())
+                                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 12, trailing: 0))
                                 .listRowBackground(Color.clear)
                                 .listRowSeparator(.hidden)
 
@@ -42,7 +42,7 @@ struct HomeView: View {
                                 StatTileView(title: "Income (this month)", amount: monthlyIncome, tintColor: Theme.income)
                                 StatTileView(title: "Expenses (this month)", amount: monthlyExpenses, tintColor: Theme.expense)
                             }
-                            .listRowInsets(EdgeInsets())
+                            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 12, trailing: 0))
                             .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)
                         }
@@ -73,6 +73,8 @@ struct HomeView: View {
                         }
                     }
                     .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+                    .background(Theme.pageBackground)
                     .refreshable {
                         await viewModel.loadTransactions()
                     }
