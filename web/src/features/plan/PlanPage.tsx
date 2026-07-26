@@ -2,6 +2,7 @@ import { Plus, Target, Trash2 } from 'lucide-react';
 import { useState, type MouseEvent } from 'react';
 import { Modal } from '../../components/Modal';
 import { formatCurrency } from '../../lib/currency';
+import { rankShade } from '../../lib/rankShade';
 import type { Goal, GoalInput } from '../../domain/goal';
 import { GoalForm } from './GoalForm';
 import { useCreateGoal, useDeleteGoal, useGoals, useUpdateGoal } from './queries';
@@ -52,7 +53,7 @@ export function PlanPage() {
         <button
           type="button"
           onClick={openAddModal}
-          className="flex items-center gap-1.5 rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+          className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-950"
         >
           <Plus size={16} />
           Add Goal
@@ -64,13 +65,19 @@ export function PlanPage() {
       ) : error ? (
         <p className="text-red-600 dark:text-red-400">{error.message}</p>
       ) : (goals ?? []).length === 0 ? (
-        <div className="rounded-2xl bg-white p-8 text-center shadow-sm dark:bg-gray-800">
+        <div className="rounded-3xl bg-white p-8 text-center shadow-sm dark:bg-gray-800">
           <p className="text-gray-500 dark:text-gray-400">No goals yet. Add a savings goal to track your progress.</p>
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          {(goals ?? []).map((goal) => (
-            <GoalCard key={goal.id} goal={goal} onClick={() => openEditModal(goal)} onDelete={(e) => handleDelete(goal, e)} />
+          {(goals ?? []).map((goal, index) => (
+            <GoalCard
+              key={goal.id}
+              goal={goal}
+              shade={rankShade(index)}
+              onClick={() => openEditModal(goal)}
+              onDelete={(e) => handleDelete(goal, e)}
+            />
           ))}
         </div>
       )}
@@ -91,10 +98,12 @@ export function PlanPage() {
 
 function GoalCard({
   goal,
+  shade,
   onClick,
   onDelete,
 }: {
   goal: Goal;
+  shade: string;
   onClick: () => void;
   onDelete: (event: MouseEvent) => void;
 }) {
@@ -108,10 +117,13 @@ function GoalCard({
       onKeyDown={(event) => {
         if (event.key === 'Enter') onClick();
       }}
-      className="group flex cursor-pointer flex-col gap-3 rounded-2xl bg-white p-5 text-left shadow-sm hover:shadow-md dark:bg-gray-800"
+      className="group flex cursor-pointer flex-col gap-3 rounded-3xl bg-white p-5 text-left shadow-sm hover:shadow-md dark:bg-gray-800"
     >
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-700 text-white">
+        <div
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white"
+          style={{ backgroundColor: shade }}
+        >
           <Target size={20} />
         </div>
         <div className="min-w-0 flex-1">
@@ -133,7 +145,7 @@ function GoalCard({
       </div>
 
       <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
-        <div className="h-full rounded-full bg-slate-700" style={{ width: `${progress * 100}%` }} />
+        <div className="h-full rounded-full" style={{ width: `${progress * 100}%`, backgroundColor: shade }} />
       </div>
       <p className="text-xs text-gray-500 dark:text-gray-400">{Math.round(progress * 100)}% funded</p>
     </div>

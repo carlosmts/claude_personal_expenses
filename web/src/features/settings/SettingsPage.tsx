@@ -66,15 +66,15 @@ export function SettingsPage() {
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
+      <section className="rounded-3xl bg-white p-6 shadow-sm dark:bg-gray-800">
         <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">Appearance</h2>
-        <div className="grid grid-cols-3 gap-2 rounded-xl bg-gray-100 p-1 dark:bg-gray-700">
+        <div className="grid grid-cols-3 gap-2 rounded-full bg-gray-100 p-1 dark:bg-gray-700">
           {THEME_OPTIONS.map((option) => (
             <button
               key={option.value}
               type="button"
               onClick={() => handleThemeChange(option.value)}
-              className={`rounded-lg py-1.5 text-sm font-medium transition-colors ${
+              className={`rounded-full py-1.5 text-sm font-medium transition-colors ${
                 themePreference === option.value
                   ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white'
                   : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
@@ -86,7 +86,7 @@ export function SettingsPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
+      <section className="rounded-3xl bg-white p-6 shadow-sm dark:bg-gray-800">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Backend Server</h2>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           Your backend's LAN address changes sometimes (e.g. after a router reboot) — update it here without
@@ -105,7 +105,7 @@ export function SettingsPage() {
           <button
             type="button"
             onClick={handleSaveBaseUrl}
-            className="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+            className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-950"
           >
             Save
           </button>
@@ -119,7 +119,7 @@ export function SettingsPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
+      <section className="rounded-3xl bg-white p-6 shadow-sm dark:bg-gray-800">
         <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">People</h2>
         <ul className="flex flex-col divide-y divide-gray-100 dark:divide-gray-700">
           {(users ?? []).map((user) => (
@@ -138,7 +138,7 @@ export function SettingsPage() {
         </ul>
       </section>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
+      <section className="rounded-3xl bg-white p-6 shadow-sm dark:bg-gray-800">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Categories</h2>
         <p className="mt-1 mb-2 text-sm text-gray-500 dark:text-gray-400">
           A category with existing transactions can't be deleted.
@@ -169,7 +169,7 @@ export function SettingsPage() {
         </ul>
       </section>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
+      <section className="rounded-3xl bg-white p-6 shadow-sm dark:bg-gray-800">
         <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">About</h2>
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-500 dark:text-gray-400">Version</span>
@@ -260,7 +260,7 @@ function RenameModal({
           <button
             type="submit"
             disabled={name.trim() === '' || isSubmitting}
-            className="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-950 disabled:opacity-50"
           >
             {isSubmitting ? 'Saving…' : 'Save'}
           </button>

@@ -1,9 +1,10 @@
-import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Lightbulb, Sparkles } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import { CategoryIcon } from '../../components/CategoryIcon';
+import { InitialsAvatar } from '../../components/InitialsAvatar';
 import { formatCurrency } from '../../lib/currency';
-import { categoryStyle } from '../../lib/categoryStyle';
+import { rankShade } from '../../lib/rankShade';
 import { percentChange } from '../../lib/percentChange';
 import type { CategoryAmount, UserAmount } from '../../domain/summary';
 import { useMonthlySummary } from './queries';
@@ -79,7 +80,7 @@ export function ReportPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Report</h1>
 
-        <div className="flex items-center gap-1 rounded-xl bg-white p-1 shadow-sm dark:bg-gray-800">
+        <div className="flex items-center gap-1 rounded-full bg-white p-1 shadow-sm dark:bg-gray-800">
           <button
             type="button"
             onClick={goToPreviousMonth}
@@ -103,7 +104,7 @@ export function ReportPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 rounded-xl bg-white p-1 shadow-sm sm:max-w-xs dark:bg-gray-800">
+      <div className="grid grid-cols-2 gap-2 rounded-full bg-white p-1 shadow-sm sm:max-w-xs dark:bg-gray-800">
         {(['expense', 'income'] as const).map((option) => (
           <button
             key={option}
@@ -112,10 +113,10 @@ export function ReportPage() {
               setSelectedType(option);
               setActiveIndex(null);
             }}
-            className={`rounded-lg py-1.5 text-sm font-medium capitalize transition-colors ${
+            className={`rounded-full py-1.5 text-sm font-medium capitalize transition-colors ${
               selectedType === option
                 ? option === 'expense'
-                  ? 'bg-red-600 text-white shadow-sm'
+                  ? 'bg-slate-900 text-white shadow-sm'
                   : 'bg-green-600 text-white shadow-sm'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             }`}
@@ -126,7 +127,7 @@ export function ReportPage() {
       </div>
 
       {categories.length === 0 ? (
-        <div className="rounded-2xl bg-white p-10 text-center shadow-sm dark:bg-gray-800">
+        <div className="rounded-3xl bg-white p-10 text-center shadow-sm dark:bg-gray-800">
           <p className="text-gray-500 dark:text-gray-400">
             No {selectedType} data recorded for {monthTitle(selectedYear, selectedMonth)} yet.
           </p>
@@ -135,7 +136,7 @@ export function ReportPage() {
         <>
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
             <div className="flex flex-col gap-6">
-              <div className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
+              <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-gray-800">
                 <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-stretch">
                   <div className="relative h-64 w-64 shrink-0">
                     <ResponsiveContainer width="100%" height="100%">
@@ -155,7 +156,7 @@ export function ReportPage() {
                           {categories.map((category, index) => (
                             <Cell
                               key={category.categoryId}
-                              fill={categoryStyle(category.categoryName).color}
+                              fill={rankShade(index)}
                               opacity={activeIndex === null || activeIndex === index ? 1 : 0.3}
                               className="cursor-pointer transition-opacity"
                             />
@@ -193,7 +194,7 @@ export function ReportPage() {
                             Total {selectedType}
                           </span>
                           <span
-                            className={`text-2xl font-bold ${selectedType === 'expense' ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}
+                            className={`text-2xl font-bold ${selectedType === 'expense' ? 'text-gray-900 dark:text-white' : 'text-green-600 dark:text-green-400'}`}
                           >
                             {formatCurrency(total)}
                           </span>
@@ -227,33 +228,42 @@ export function ReportPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
+            <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-gray-800">
               <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">By Category</h2>
               <div className="flex flex-col gap-4">
-                {categories.map((category) => (
-                  <CategoryBreakdownRow key={category.categoryId} category={category} total={total} />
+                {categories.map((category, index) => (
+                  <CategoryBreakdownRow
+                    key={category.categoryId}
+                    category={category}
+                    total={total}
+                    shade={rankShade(index)}
+                  />
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
-            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">By Person</h2>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {summary.byUser.map((userAmount) => (
-                <PersonBreakdownCard key={userAmount.userId} userAmount={userAmount} />
-              ))}
-            </div>
-          </div>
+          <ByPersonCard
+            byUser={summary.byUser}
+            previousByUser={previousSummary?.byUser ?? null}
+            selectedType={selectedType}
+          />
         </>
       )}
     </div>
   );
 }
 
-function CategoryBreakdownRow({ category, total }: { category: CategoryAmount; total: number }) {
+function CategoryBreakdownRow({
+  category,
+  total,
+  shade,
+}: {
+  category: CategoryAmount;
+  total: number;
+  shade: string;
+}) {
   const percent = total > 0 ? (category.amount / total) * 100 : 0;
-  const { color } = categoryStyle(category.categoryName);
 
   return (
     <div className="flex flex-col gap-2">
@@ -266,37 +276,75 @@ function CategoryBreakdownRow({ category, total }: { category: CategoryAmount; t
         <p className="shrink-0 font-semibold text-gray-900 dark:text-white">{formatCurrency(category.amount)}</p>
       </div>
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
-        <div className="h-full rounded-full transition-all" style={{ width: `${percent}%`, backgroundColor: color }} />
+        <div className="h-full rounded-full transition-all" style={{ width: `${percent}%`, backgroundColor: shade }} />
       </div>
     </div>
   );
 }
 
-function PersonBreakdownCard({ userAmount }: { userAmount: UserAmount }) {
-  const net = userAmount.totalIncome - userAmount.totalExpense;
-  const flow = userAmount.totalIncome + userAmount.totalExpense;
-  const incomeShare = flow > 0 ? (userAmount.totalIncome / flow) * 100 : 0;
+function amountForType(userAmount: UserAmount, type: TransactionType): number {
+  return type === 'expense' ? userAmount.totalExpense : userAmount.totalIncome;
+}
+
+function ByPersonCard({
+  byUser,
+  previousByUser,
+  selectedType,
+}: {
+  byUser: UserAmount[];
+  previousByUser: UserAmount[] | null;
+  selectedType: TransactionType;
+}) {
+  const ranked = [...byUser].sort((a, b) => amountForType(b, selectedType) - amountForType(a, selectedType));
+  const total = ranked.reduce((sum, user) => sum + amountForType(user, selectedType), 0);
+
+  const topPerson = ranked[0];
+  const topPersonPrevious = previousByUser?.find((user) => user.userId === topPerson?.userId);
+  const insightPercent =
+    topPerson && topPersonPrevious
+      ? percentChange(amountForType(topPerson, selectedType), amountForType(topPersonPrevious, selectedType))
+      : null;
 
   return (
-    <div className="rounded-xl border border-gray-100 p-4 dark:border-gray-700">
-      <div className="flex items-center justify-between">
-        <span className="font-semibold text-gray-900 dark:text-white">{userAmount.userName}</span>
-        <span className={`font-semibold ${net >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-          {formatCurrency(net)}
-        </span>
+    <div className="rounded-3xl bg-slate-100 p-6 shadow-sm dark:bg-gray-800/60">
+      <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">By Person</h2>
+      <div className="flex flex-col gap-5">
+        {ranked.map((userAmount, index) => {
+          const amount = amountForType(userAmount, selectedType);
+          const percent = total > 0 ? (amount / total) * 100 : 0;
+          return (
+            <div key={userAmount.userId}>
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-2 font-medium text-gray-900 dark:text-white">
+                  <InitialsAvatar name={userAmount.userName} userId={userAmount.userId} size={28} />
+                  {userAmount.userName}
+                </span>
+                <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(amount)}</span>
+              </div>
+              <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-white dark:bg-gray-700">
+                <div
+                  className="h-full rounded-full"
+                  style={{ width: `${percent}%`, backgroundColor: rankShade(index) }}
+                />
+              </div>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{Math.round(percent)}% Contribution</p>
+            </div>
+          );
+        })}
       </div>
-      <div className="mt-3 flex h-2 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
-        {flow > 0 ? (
-          <>
-            <div className="h-full bg-green-500" style={{ width: `${incomeShare}%` }} />
-            <div className="h-full bg-red-500" style={{ width: `${100 - incomeShare}%` }} />
-          </>
-        ) : null}
-      </div>
-      <div className="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-        <span>Income {formatCurrency(userAmount.totalIncome)}</span>
-        <span>Expenses {formatCurrency(userAmount.totalExpense)}</span>
-      </div>
+
+      {topPerson && insightPercent !== null && (
+        <div className="mt-5 flex items-start gap-2 border-t border-gray-200 pt-4 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-300">
+          <Lightbulb size={16} className="mt-0.5 shrink-0 text-gray-400 dark:text-gray-500" />
+          <p>
+            {topPerson.userName} contributed{' '}
+            <span className="font-semibold text-gray-900 dark:text-white">
+              {Math.abs(insightPercent).toFixed(0)}% {insightPercent >= 0 ? 'more' : 'less'}
+            </span>{' '}
+            than last month.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

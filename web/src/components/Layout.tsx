@@ -19,7 +19,7 @@ export function Layout({ children }: LayoutProps) {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-gray-900">
       <Sidebar collapsed={collapsed} onToggleCollapsed={toggleCollapsed} />
       <main className="min-w-0 flex-1 overflow-x-auto p-8">{children}</main>
     </div>

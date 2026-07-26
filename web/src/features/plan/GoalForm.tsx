@@ -83,13 +83,13 @@ export function GoalForm({ editingGoal, onSubmit, onCancel, isSubmitting }: Goal
 
       <div className="flex flex-col gap-1">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Whose goal is this?</span>
-        <div className="grid grid-cols-3 gap-2 rounded-xl bg-gray-100 p-1 dark:bg-gray-700">
+        <div className="grid grid-cols-3 gap-2 rounded-full bg-gray-100 p-1 dark:bg-gray-700">
           {(users ?? []).map((user) => (
             <button
               key={user.id}
               type="button"
               onClick={() => setOwner(user.id)}
-              className={`rounded-lg py-1.5 text-sm font-medium transition-colors ${
+              className={`rounded-full py-1.5 text-sm font-medium transition-colors ${
                 owner === user.id
                   ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white'
                   : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
@@ -101,7 +101,7 @@ export function GoalForm({ editingGoal, onSubmit, onCancel, isSubmitting }: Goal
           <button
             type="button"
             onClick={() => setOwner('both')}
-            className={`rounded-lg py-1.5 text-sm font-medium transition-colors ${
+            className={`rounded-full py-1.5 text-sm font-medium transition-colors ${
               owner === 'both'
                 ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
@@ -123,7 +123,7 @@ export function GoalForm({ editingGoal, onSubmit, onCancel, isSubmitting }: Goal
         <button
           type="submit"
           disabled={!isValid || isSubmitting}
-          className="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+          className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-950 disabled:opacity-50"
         >
           {isSubmitting ? 'Saving…' : 'Save'}
         </button>

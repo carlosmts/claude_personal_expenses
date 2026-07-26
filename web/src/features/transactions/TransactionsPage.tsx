@@ -65,7 +65,7 @@ export function TransactionsPage() {
         <button
           type="button"
           onClick={openAddModal}
-          className="flex items-center gap-1.5 rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+          className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-950"
         >
           <Plus size={16} />
           Add Transaction
@@ -74,7 +74,7 @@ export function TransactionsPage() {
 
       <PersonFilter users={users ?? []} selectedUserId={selectedUserId} onChange={setSelectedUserId} />
 
-      <div className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
+      <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-gray-800">
         {isLoading ? (
           <p className="text-gray-500 dark:text-gray-400">Loading…</p>
         ) : error ? (
@@ -121,18 +121,21 @@ function TransactionRow({
   const signedAmount = transaction.type === 'expense' ? -transaction.amount : transaction.amount;
   return (
     <li className="group flex items-center gap-3 py-3">
-      <CategoryIcon categoryName={transaction.categoryName} />
+      <CategoryIcon categoryName={transaction.categoryName} shape="square" />
       <div className="min-w-0 flex-1">
-        <p className="truncate font-medium text-gray-900 dark:text-white">{transaction.categoryName}</p>
+        <div className="flex items-center gap-2">
+          <p className="truncate font-medium text-gray-900 dark:text-white">{transaction.categoryName}</p>
+          <span className="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-gray-500 uppercase dark:bg-gray-700 dark:text-gray-400">
+            {transaction.userName}
+          </span>
+        </div>
         {transaction.description ? (
           <p className="truncate text-sm text-gray-500 dark:text-gray-400">{transaction.description}</p>
         ) : null}
-        <p className="text-xs text-gray-400 dark:text-gray-500">
-          {transaction.userName} · {transaction.date}
-        </p>
+        <p className="text-xs text-gray-400 dark:text-gray-500">{transaction.date}</p>
       </div>
       <p
-        className={`shrink-0 font-semibold ${transaction.type === 'expense' ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}
+        className={`shrink-0 font-semibold ${transaction.type === 'expense' ? 'text-gray-900 dark:text-white' : 'text-green-600 dark:text-green-400'}`}
       >
         {formatCurrency(signedAmount)}
       </p>
