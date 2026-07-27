@@ -5,6 +5,8 @@ struct UserBreakdownRowView: View {
 
     var body: some View {
         HStack {
+            InitialsAvatarView(name: userAmount.userName, userId: userAmount.userId, size: 32)
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(userAmount.userName)
                     .font(.subheadline.bold())

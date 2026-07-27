@@ -11,7 +11,7 @@ struct TransactionRowView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            CategoryIconView(categoryName: transaction.categoryName)
+            CategoryIconView(categoryName: transaction.categoryName, shape: .square)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(transaction.categoryName)

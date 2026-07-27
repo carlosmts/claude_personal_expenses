@@ -17,12 +17,13 @@ targets:
     info:
       path: Generated/Info.plist
       properties:
-        CFBundleDisplayName: Expense Tracker
+        CFBundleDisplayName: Finbond
         UILaunchScreen: {}
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
-        NSLocalNetworkUsageDescription: "Expense Tracker connects to your local backend server to sync transactions."
+        NSLocalNetworkUsageDescription: "Finbond connects to your local backend server to sync transactions."
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.carlosmts.expensetracker
         TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon

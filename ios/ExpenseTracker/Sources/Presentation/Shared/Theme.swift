@@ -21,28 +21,50 @@ extension Color {
     }
 }
 
-/// Design tokens mirroring the web app's slate/steel-blue palette — see
-/// web/src/lib/categoryStyle.ts and the Tailwind classes in web/src/components
-/// for the source values this is kept in sync with.
+/// Design tokens mirroring the Finbond web app's palette — see
+/// web/src/lib/categoryStyle.ts, web/src/lib/rankShade.ts, and the Tailwind
+/// classes in web/src/components for the source values this is kept in sync
+/// with.
 enum Theme {
-    /// Sidebar / primary-button color on web (`bg-slate-700`) — constant across
-    /// light/dark since the web app doesn't vary it either.
-    static let brandPrimary = Color(hex: "334155")
+    /// Sidebar / primary-button / hero-card color on web (`bg-slate-900`) —
+    /// constant across light/dark since the web app doesn't vary it either.
+    static let brandPrimary = Color(hex: "0f172a")
 
     static let income = Color(light: "16a34a", dark: "4ade80")   // green-600 / green-400
-    static let expense = Color(light: "dc2626", dark: "f87171")  // red-600 / red-400
 
-    /// Matches the web app's `rounded-2xl` (1rem) card corner radius.
-    static let cardCornerRadius: CGFloat = 16
+    /// Expense amounts and "bad" growth indicators are plain neutral text now
+    /// (not red) — matches the reference mockups, which never use red
+    /// anywhere. Uses the system label color so it stays perfectly adaptive.
+    static let expense = Color(uiColor: .label)
+
+    /// Greyscale ramp for shading chart slices/bars by sort position rather
+    /// than by category/person identity — biggest is darkest, tapering to
+    /// light grey. Mirrors web's rankShade.ts.
+    private static let rankShades = [
+        Color(hex: "0f172a"), Color(hex: "475569"), Color(hex: "94a3b8"),
+        Color(hex: "cbd5e1"), Color(hex: "e2e8f0"),
+    ]
+
+    static func rankShade(_ index: Int) -> Color {
+        rankShades[Swift.min(index, rankShades.count - 1)]
+    }
+
+    /// Matches the web app's `rounded-3xl` (1.5rem) card corner radius.
+    static let cardCornerRadius: CGFloat = 20
 
     /// Matches the web app's `text-3xl font-bold` big-stat numbers.
     static let statFont = Font.system(size: 30, weight: .bold)
 
     /// Page background behind floating cards — matches the web's
-    /// `bg-gray-50 dark:bg-gray-900` page background, distinct from the
+    /// `bg-slate-50 dark:bg-gray-900` page background, distinct from the
     /// white/`secondarySystemGroupedBackground` card fill so cards actually
     /// read as elevated instead of blending into a plain white background.
-    static let pageBackground = Color(light: "f9fafb", dark: "111827")
+    static let pageBackground = Color(light: "f8fafc", dark: "111827")
+
+    /// "Panel" background for highlighted-but-not-a-card sections (By
+    /// Person, Quick Action equivalents) — matches web's `bg-slate-100
+    /// dark:bg-gray-800/60`, distinct from both the page and plain card fills.
+    static let panelBackground = Color(light: "f1f5f9", dark: "1e293b")
 
     static let cardShadowColor = Color.black.opacity(0.06)
     static let cardShadowRadius: CGFloat = 6

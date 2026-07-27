@@ -6,13 +6,13 @@ struct CategoryDonutChartView: View {
     let total: Decimal
 
     var body: some View {
-        Chart(categories) { category in
+        Chart(Array(categories.enumerated()), id: \.element.id) { index, category in
             SectorMark(
                 angle: .value("Amount", NSDecimalNumber(decimal: category.amount).doubleValue),
                 innerRadius: .ratio(0.6),
                 angularInset: 1.5
             )
-            .foregroundStyle(CategoryStyle.color(for: category.categoryName))
+            .foregroundStyle(Theme.rankShade(index))
             .cornerRadius(4)
         }
         .chartLegend(.hidden)

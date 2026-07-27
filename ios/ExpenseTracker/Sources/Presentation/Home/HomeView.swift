@@ -54,7 +54,12 @@ struct HomeView: View {
                                     growthVsLastMonth: percentChange(
                                         current: summary.currentMonthIncome - summary.currentMonthExpense,
                                         previous: summary.previousMonthIncome - summary.previousMonthExpense
-                                    )
+                                    ),
+                                    growthVsLastYear: percentChange(
+                                        current: summary.currentMonthIncome - summary.currentMonthExpense,
+                                        previous: summary.previousYearMonthIncome - summary.previousYearMonthExpense
+                                    ),
+                                    monthlyBreakdown: summary.monthlyBreakdown
                                 )
                                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 12, trailing: 0))
                                 .listRowBackground(Color.clear)

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct GoalRowView: View {
     let goal: Goal
+    let shade: Color
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -9,7 +10,7 @@ struct GoalRowView: View {
                 Image(systemName: "target")
                     .foregroundStyle(.white)
                     .frame(width: 40, height: 40)
-                    .background(Theme.brandPrimary)
+                    .background(shade)
                     .clipShape(Circle())
 
                 VStack(alignment: .leading, spacing: 2) {
@@ -32,7 +33,7 @@ struct GoalRowView: View {
             }
 
             ProgressView(value: progress)
-                .tint(Theme.brandPrimary)
+                .tint(shade)
 
             Text("\(Int((progress * 100).rounded()))% funded")
                 .font(.caption)

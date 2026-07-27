@@ -3,6 +3,7 @@ import SwiftUI
 struct CategoryBreakdownRowView: View {
     let category: CategoryAmount
     let total: Decimal
+    let shade: Color
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -24,7 +25,7 @@ struct CategoryBreakdownRowView: View {
             }
 
             ProgressView(value: percentage)
-                .tint(CategoryStyle.color(for: category.categoryName))
+                .tint(shade)
         }
         .padding(12)
         .cardStyle()

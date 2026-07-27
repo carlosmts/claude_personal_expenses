@@ -36,11 +36,11 @@ struct PlanView: View {
                     )
                 } else {
                     List {
-                        ForEach(viewModel.goals) { goal in
+                        ForEach(Array(viewModel.goals.enumerated()), id: \.element.id) { index, goal in
                             Button {
                                 formMode = .edit(goal)
                             } label: {
-                                GoalRowView(goal: goal)
+                                GoalRowView(goal: goal, shade: Theme.rankShade(index))
                             }
                             .buttonStyle(.plain)
                             .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))

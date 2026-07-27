@@ -54,7 +54,8 @@ struct ReportView: View {
 
     @ViewBuilder
     private func content(for summary: MonthlySummary) -> some View {
-        let categories = selectedType == .expense ? summary.expensesByCategory : summary.incomeByCategory
+        let categories = (selectedType == .expense ? summary.expensesByCategory : summary.incomeByCategory)
+            .sorted { $0.amount > $1.amount }
         let total = selectedType == .expense ? summary.totalExpense : summary.totalIncome
 
         ScrollView {
@@ -81,8 +82,8 @@ struct ReportView: View {
                         .padding(.horizontal)
 
                     VStack(spacing: 12) {
-                        ForEach(categories) { category in
-                            CategoryBreakdownRowView(category: category, total: total)
+                        ForEach(Array(categories.enumerated()), id: \.element.id) { index, category in
+                            CategoryBreakdownRowView(category: category, total: total, shade: Theme.rankShade(index))
                         }
                     }
                     .padding(.horizontal)
