@@ -14,6 +14,7 @@ class DashboardSummary:
     """Read-only aggregation for the Dashboard's top cards + yearly chart."""
 
     year: int
+    month: int
     all_time_income: Decimal
     all_time_expense: Decimal
     current_month_income: Decimal

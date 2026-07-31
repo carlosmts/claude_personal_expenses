@@ -24,12 +24,11 @@ class SqlAlchemyDashboardRepository(DashboardRepository):
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def get_dashboard_summary(self, year: int, user_id: int | None) -> DashboardSummary:
-        today = date.today()
-        current_start, current_end = _month_bounds(today.year, today.month)
-        prev_year, prev_month = _previous_month(today.year, today.month)
+    async def get_dashboard_summary(self, year: int, month: int, user_id: int | None) -> DashboardSummary:
+        current_start, current_end = _month_bounds(year, month)
+        prev_year, prev_month = _previous_month(year, month)
         prev_start, prev_end = _month_bounds(prev_year, prev_month)
-        prev_year_month_start, prev_year_month_end = _month_bounds(today.year - 1, today.month)
+        prev_year_month_start, prev_year_month_end = _month_bounds(year - 1, month)
 
         all_time_income, all_time_expense = await self._totals(user_id)
         current_month_income, current_month_expense = await self._totals(user_id, current_start, current_end)
@@ -40,6 +39,7 @@ class SqlAlchemyDashboardRepository(DashboardRepository):
 
         return DashboardSummary(
             year=year,
+            month=month,
             all_time_income=all_time_income,
             all_time_expense=all_time_expense,
             current_month_income=current_month_income,

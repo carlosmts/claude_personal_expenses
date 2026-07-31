@@ -154,5 +154,5 @@ class FakeDashboardRepository(DashboardRepository):
     def __init__(self, summary: DashboardSummary) -> None:
         self._summary = summary
 
-    async def get_dashboard_summary(self, year: int, user_id: int | None) -> DashboardSummary:
+    async def get_dashboard_summary(self, year: int, month: int, user_id: int | None) -> DashboardSummary:
         return self._summary

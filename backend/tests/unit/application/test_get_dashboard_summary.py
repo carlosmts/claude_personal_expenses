@@ -8,6 +8,7 @@ from tests.unit.application.fakes import FakeDashboardRepository
 async def test_returns_summary_from_repository() -> None:
     expected = DashboardSummary(
         year=2026,
+        month=7,
         all_time_income=Decimal("10000.00"),
         all_time_expense=Decimal("4000.00"),
         current_month_income=Decimal("2000.00"),
@@ -20,6 +21,6 @@ async def test_returns_summary_from_repository() -> None:
     )
     use_case = GetDashboardSummaryUseCase(FakeDashboardRepository(expected))
 
-    result = await use_case.execute(2026, user_id=None)
+    result = await use_case.execute(2026, 7, user_id=None)
 
     assert result == expected

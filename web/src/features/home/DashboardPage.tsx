@@ -23,19 +23,36 @@ import { useCreateTransaction, useTransactions } from '../transactions/queries';
 import { useUsers } from '../users/queries';
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const CURRENT_YEAR = new Date().getFullYear();
-const YEAR_OPTIONS = Array.from({ length: 5 }, (_, index) => CURRENT_YEAR - index);
 
 function formatAxisTick(value: number): string {
   return value >= 1000 ? `€${(value / 1000).toFixed(0)}k` : `€${value.toFixed(0)}`;
 }
 
+function currentPeriod(): { year: number; month: number } {
+  const now = new Date();
+  return { year: now.getFullYear(), month: now.getMonth() + 1 };
+}
+
+function periodOptions(count: number): { year: number; month: number }[] {
+  const { year, month } = currentPeriod();
+  return Array.from({ length: count }, (_, index) => {
+    const totalMonths = year * 12 + (month - 1) - index;
+    return { year: Math.floor(totalMonths / 12), month: (totalMonths % 12) + 1 };
+  });
+}
+
+function formatMonthYear(year: number, month: number): string {
+  return `${String(month).padStart(2, '0')}-${year}`;
+}
+
 export function DashboardPage() {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const [selectedYear, setSelectedYear] = useState(CURRENT_YEAR);
+  const [selectedPeriod, setSelectedPeriod] = useState(currentPeriod);
+  const [chartMode, setChartMode] = useState<MiniChartMode>('both');
 
   const { data: summary, isLoading: isSummaryLoading, error: summaryError } = useDashboardSummary(
-    selectedYear,
+    selectedPeriod.year,
+    selectedPeriod.month,
     selectedUserId
   );
   const { data: users } = useUsers();
@@ -74,14 +91,22 @@ export function DashboardPage() {
   return (
     <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
       <div className="flex flex-col gap-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-          <PersonFilter users={users ?? []} selectedUserId={selectedUserId} onChange={setSelectedUserId} />
+          <div className="flex flex-wrap items-center gap-3">
+            <MonthYearFilter period={selectedPeriod} onChange={setSelectedPeriod} />
+            <PersonFilter users={users ?? []} selectedUserId={selectedUserId} onChange={setSelectedUserId} />
+          </div>
         </div>
 
         <div className="rounded-3xl bg-slate-900 p-6 text-white">
-          <p className="text-xs font-semibold tracking-wide text-slate-400 uppercase">Current Balance</p>
-          <p className="mt-2 text-4xl font-bold">{formatCurrency(balance)}</p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold tracking-wide text-slate-400 uppercase">Current Balance</p>
+              <p className="mt-2 text-4xl font-bold">{formatCurrency(balance)}</p>
+            </div>
+            <MiniChartModeToggle mode={chartMode} onChange={setChartMode} />
+          </div>
           <div className="mt-3 flex flex-wrap gap-4">
             <GrowthBadge
               label="vs last month"
@@ -91,12 +116,14 @@ export function DashboardPage() {
             />
             <GrowthBadge label="vs last year" percent={balanceGrowthVsLastYear} positiveIsGood variant="onDark" />
           </div>
-          <MiniMonthlyChart chartData={chartData} />
+          <MiniMonthlyChart chartData={chartData} mode={chartMode} selectedMonth={selectedPeriod.month} />
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="rounded-3xl bg-white p-5 shadow-sm dark:bg-gray-800">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Income (this month)</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Income ({formatMonthYear(selectedPeriod.year, selectedPeriod.month)})
+            </p>
             <p className="mt-1 text-3xl font-bold text-green-600 dark:text-green-400">
               {formatCurrency(summary.currentMonthIncome)}
             </p>
@@ -106,7 +133,9 @@ export function DashboardPage() {
           </div>
 
           <div className="rounded-3xl bg-white p-5 shadow-sm dark:bg-gray-800">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Expenses (this month)</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Expenses ({formatMonthYear(selectedPeriod.year, selectedPeriod.month)})
+            </p>
             <p className="mt-1 text-3xl font-bold text-gray-900 dark:text-white">
               {formatCurrency(summary.currentMonthExpense)}
             </p>
@@ -119,17 +148,7 @@ export function DashboardPage() {
         <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-gray-800">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Monthly Overview</h2>
-            <select
-              value={selectedYear}
-              onChange={(event) => setSelectedYear(Number(event.target.value))}
-              className="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
-            >
-              {YEAR_OPTIONS.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
+            <span className="text-sm text-gray-500 dark:text-gray-400">{selectedPeriod.year}</span>
           </div>
           <div className="text-gray-400 dark:text-gray-500">
             <ResponsiveContainer width="100%" height={320}>
@@ -172,27 +191,115 @@ export function DashboardPage() {
   );
 }
 
-function MiniMonthlyChart({ chartData }: { chartData: { month: string; income: number; expense: number }[] }) {
-  const totals = chartData.map((entry) => entry.income + entry.expense);
+type MiniChartMode = 'both' | 'income' | 'expense';
+
+const MINI_CHART_MODE_OPTIONS: { value: MiniChartMode; label: string }[] = [
+  { value: 'both', label: 'Both' },
+  { value: 'income', label: 'Income' },
+  { value: 'expense', label: 'Expenses' },
+];
+
+function MiniChartModeToggle({ mode, onChange }: { mode: MiniChartMode; onChange: (mode: MiniChartMode) => void }) {
+  return (
+    <div className="inline-flex shrink-0 gap-0.5 rounded-full bg-white/10 p-0.5">
+      {MINI_CHART_MODE_OPTIONS.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          onClick={() => onChange(option.value)}
+          className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
+            mode === option.value ? 'bg-white/20 text-white' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function MiniMonthlyChart({
+  chartData,
+  mode,
+  selectedMonth,
+}: {
+  chartData: { month: string; income: number; expense: number }[];
+  mode: MiniChartMode;
+  selectedMonth: number;
+}) {
+  const totals = chartData.map((entry) =>
+    mode === 'income' ? entry.income : mode === 'expense' ? entry.expense : entry.income + entry.expense
+  );
   const max = Math.max(...totals, 1);
-  const lastActiveIndex = totals.reduce((last, value, index) => (value > 0 ? index : last), 0);
 
   return (
     <div className="mt-6 flex h-16 items-stretch gap-1.5">
       {chartData.map((entry, index) => {
-        const isHighlighted = index === lastActiveIndex;
-        const heightPercent = Math.max((totals[index] / max) * 100, 10);
+        const isHighlighted = index === selectedMonth - 1;
+        const total = totals[index];
+        const hasData = total > 0;
+        const heightPercent = hasData ? Math.max((total / max) * 100, 10) : isHighlighted ? 8 : 4;
+
         return (
           <div key={entry.month} className="flex flex-1 flex-col items-center justify-end gap-1">
             <div
-              className={`w-full rounded-t ${isHighlighted ? 'bg-blue-300' : 'bg-slate-600'}`}
+              className="flex w-full flex-col justify-end overflow-hidden rounded-t"
               style={{ height: `${heightPercent}%` }}
-            />
+            >
+              {!hasData ? (
+                <div className={`h-full w-full ${isHighlighted ? 'bg-blue-300/60' : 'bg-slate-700'}`} />
+              ) : mode === 'both' ? (
+                <>
+                  <div
+                    className={isHighlighted ? 'bg-blue-300' : 'bg-slate-500'}
+                    style={{ height: `${(entry.expense / total) * 100}%` }}
+                  />
+                  <div
+                    className={isHighlighted ? 'bg-emerald-300' : 'bg-emerald-500/50'}
+                    style={{ height: `${(entry.income / total) * 100}%` }}
+                  />
+                </>
+              ) : (
+                <div
+                  className={`h-full w-full ${
+                    isHighlighted ? 'bg-blue-300' : mode === 'income' ? 'bg-emerald-500/70' : 'bg-slate-500'
+                  }`}
+                />
+              )}
+            </div>
             {index % 2 === 0 && <span className="text-[10px] text-slate-400">{entry.month}</span>}
           </div>
         );
       })}
     </div>
+  );
+}
+
+function MonthYearFilter({
+  period,
+  onChange,
+}: {
+  period: { year: number; month: number };
+  onChange: (period: { year: number; month: number }) => void;
+}) {
+  const options = useMemo(() => periodOptions(36), []);
+  const value = `${period.year}-${period.month}`;
+
+  return (
+    <select
+      value={value}
+      onChange={(event) => {
+        const [year, month] = event.target.value.split('-').map(Number);
+        onChange({ year, month });
+      }}
+      className="rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm font-medium text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+    >
+      {options.map((option) => (
+        <option key={`${option.year}-${option.month}`} value={`${option.year}-${option.month}`}>
+          {formatMonthYear(option.year, option.month)}
+        </option>
+      ))}
+    </select>
   );
 }
 

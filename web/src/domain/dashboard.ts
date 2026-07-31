@@ -6,6 +6,7 @@ export interface MonthBreakdown {
 
 export interface DashboardSummary {
   year: number;
+  month: number;
   allTimeIncome: number;
   allTimeExpense: number;
   currentMonthIncome: number;

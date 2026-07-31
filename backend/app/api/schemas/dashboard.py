@@ -17,6 +17,7 @@ class MonthBreakdownResponse(BaseModel):
 
 class DashboardSummaryResponse(BaseModel):
     year: int
+    month: int
     all_time_income: Decimal
     all_time_expense: Decimal
     current_month_income: Decimal
@@ -31,6 +32,7 @@ class DashboardSummaryResponse(BaseModel):
     def from_domain(cls, summary: DashboardSummary) -> "DashboardSummaryResponse":
         return cls(
             year=summary.year,
+            month=summary.month,
             all_time_income=summary.all_time_income,
             all_time_expense=summary.all_time_expense,
             current_month_income=summary.current_month_income,

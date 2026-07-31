@@ -158,6 +158,7 @@ function monthBreakdownFromDto(dto: MonthBreakdownDto): MonthBreakdown {
 
 export interface DashboardSummaryDto {
   year: number;
+  month: number;
   all_time_income: string;
   all_time_expense: string;
   current_month_income: string;
@@ -172,6 +173,7 @@ export interface DashboardSummaryDto {
 export function dashboardSummaryFromDto(dto: DashboardSummaryDto): DashboardSummary {
   return {
     year: dto.year,
+    month: dto.month,
     allTimeIncome: Number(dto.all_time_income),
     allTimeExpense: Number(dto.all_time_expense),
     currentMonthIncome: Number(dto.current_month_income),
