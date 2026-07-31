@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
+import { AuthGate } from './components/AuthGate';
 import { Layout } from './components/Layout';
 import { DashboardPage } from './features/home/DashboardPage';
 import { PlanPage } from './features/plan/PlanPage';
@@ -8,15 +9,17 @@ import { TransactionsPage } from './features/transactions/TransactionsPage';
 
 function App() {
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/transactions" element={<TransactionsPage />} />
-        <Route path="/report" element={<ReportPage />} />
-        <Route path="/plan" element={<PlanPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-      </Routes>
-    </Layout>
+    <AuthGate>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/transactions" element={<TransactionsPage />} />
+          <Route path="/report" element={<ReportPage />} />
+          <Route path="/plan" element={<PlanPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Routes>
+      </Layout>
+    </AuthGate>
   );
 }
 

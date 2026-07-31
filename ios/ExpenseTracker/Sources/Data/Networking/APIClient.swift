@@ -5,6 +5,9 @@ import Foundation
 /// JSON keys are converted snake_case <-> camelCase centrally here, so DTOs
 /// never need hand-written CodingKeys for that.
 final class APIClient {
+    /// Set by AuthState so any 401 anywhere in the app immediately drops back to the login screen.
+    static var onUnauthorized: (@Sendable () -> Void)?
+
     private let session: URLSession
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
@@ -69,6 +72,13 @@ final class APIClient {
     /// response body. Shared by both JSON-decoding calls and no-content calls
     /// (e.g. DELETE) so status/error handling isn't duplicated per method.
     private func performRequest(_ request: URLRequest) async throws -> Data {
+        var request = request
+        if let credentials = CredentialsStore.load() {
+            let raw = "\(credentials.username):\(credentials.password)"
+            let encoded = Data(raw.utf8).base64EncodedString()
+            request.setValue("Basic \(encoded)", forHTTPHeaderField: "Authorization")
+        }
+
         let data: Data
         let response: URLResponse
         do {
@@ -82,6 +92,10 @@ final class APIClient {
         }
 
         guard (200..<300).contains(httpResponse.statusCode) else {
+            if httpResponse.statusCode == 401 {
+                CredentialsStore.clear()
+                Self.onUnauthorized?()
+            }
             let message = String(data: data, encoding: .utf8) ?? "Unknown error"
             throw APIError.server(statusCode: httpResponse.statusCode, message: message)
         }

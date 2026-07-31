@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @StateObject private var viewModel: SettingsViewModel
+    @EnvironmentObject private var authState: AuthState
 
     @AppStorage("appearancePreference") private var appearanceRawValue = AppearancePreference.system.rawValue
     @State private var baseURLText = APIConfiguration.baseURL.absoluteString
@@ -88,6 +89,12 @@ struct SettingsView: View {
                     Text("Categories")
                 } footer: {
                     Text("A category with existing transactions can't be deleted.")
+                }
+
+                Section("Account") {
+                    Button("Log Out", role: .destructive) {
+                        authState.signOut()
+                    }
                 }
 
                 Section("About") {

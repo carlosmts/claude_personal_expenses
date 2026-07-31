@@ -22,6 +22,43 @@ export function setBaseUrlOverride(url: string | null): void {
   }
 }
 
+const CREDENTIALS_KEY = 'authCredentials';
+
+export interface Credentials {
+  username: string;
+  password: string;
+}
+
+export function getStoredCredentials(): Credentials | null {
+  const raw = localStorage.getItem(CREDENTIALS_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as Credentials;
+  } catch {
+    return null;
+  }
+}
+
+export function setStoredCredentials(credentials: Credentials | null): void {
+  if (credentials) {
+    localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(credentials));
+  } else {
+    localStorage.removeItem(CREDENTIALS_KEY);
+  }
+}
+
+let onUnauthorized: (() => void) | null = null;
+
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  onUnauthorized = handler;
+}
+
+function authHeader(): Record<string, string> {
+  const credentials = getStoredCredentials();
+  if (!credentials) return {};
+  return { Authorization: `Basic ${btoa(`${credentials.username}:${credentials.password}`)}` };
+}
+
 export class ApiError extends Error {
   readonly status: number;
 
@@ -39,6 +76,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
       ...init,
       headers: {
         'Content-Type': 'application/json',
+        ...authHeader(),
         ...init.headers,
       },
     });
@@ -47,6 +85,10 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   }
 
   if (!response.ok) {
+    if (response.status === 401) {
+      setStoredCredentials(null);
+      onUnauthorized?.();
+    }
     const body = await response.text();
     let message = body || response.statusText;
     try {

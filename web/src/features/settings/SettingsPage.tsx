@@ -2,7 +2,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { CategoryIcon } from '../../components/CategoryIcon';
 import { Modal } from '../../components/Modal';
-import { getBaseUrl, getDefaultBaseUrl, setBaseUrlOverride } from '../../api/client';
+import { getBaseUrl, getDefaultBaseUrl, setBaseUrlOverride, setStoredCredentials } from '../../api/client';
 import { getThemePreference, setThemePreference, type ThemePreference } from '../../lib/theme';
 import { APP_VERSION } from '../../lib/version';
 import type { Category } from '../../domain/category';
@@ -167,6 +167,20 @@ export function SettingsPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="rounded-3xl bg-white p-6 shadow-sm dark:bg-gray-800">
+        <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">Account</h2>
+        <button
+          type="button"
+          onClick={() => {
+            setStoredCredentials(null);
+            window.location.reload();
+          }}
+          className="rounded-xl px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30"
+        >
+          Log out
+        </button>
       </section>
 
       <section className="rounded-3xl bg-white p-6 shadow-sm dark:bg-gray-800">

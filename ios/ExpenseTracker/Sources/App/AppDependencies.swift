@@ -49,4 +49,9 @@ final class AppDependencies {
     func makeDashboardViewModel() -> DashboardViewModel {
         DashboardViewModel(dashboardRepository: dashboardRepository, userRepository: userRepository)
     }
+
+    @MainActor
+    func makeLoginViewModel(authState: AuthState) -> LoginViewModel {
+        LoginViewModel(userRepository: userRepository, authState: authState)
+    }
 }
