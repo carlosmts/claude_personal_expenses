@@ -56,11 +56,9 @@ private struct MiniMonthlyChartView: View {
                     RoundedRectangle(cornerRadius: 2)
                         .fill(index == lastActiveIndex ? Color(hex: "93c5fd") : Color.white.opacity(0.25))
                         .frame(height: max((totals[index] / maxTotal) * 40, 4))
-                    if index % 2 == 0 {
-                        Text(Self.monthLabels[entry.month - 1])
-                            .font(.system(size: 9))
-                            .foregroundStyle(.white.opacity(0.4))
-                    }
+                    Text(Self.monthLabels[entry.month - 1])
+                        .font(.system(size: 9))
+                        .foregroundStyle(.white.opacity(0.4))
                 }
                 .frame(maxWidth: .infinity)
             }

@@ -33,12 +33,20 @@ function currentPeriod(): { year: number; month: number } {
   return { year: now.getFullYear(), month: now.getMonth() + 1 };
 }
 
-function periodOptions(count: number): { year: number; month: number }[] {
-  const { year, month } = currentPeriod();
-  return Array.from({ length: count }, (_, index) => {
-    const totalMonths = year * 12 + (month - 1) - index;
-    return { year: Math.floor(totalMonths / 12), month: (totalMonths % 12) + 1 };
-  });
+function monthOptionsFromTransactions(transactions: Transaction[]): { year: number; month: number }[] {
+  const seen = new Map<string, { year: number; month: number }>();
+  const add = (year: number, month: number) => {
+    seen.set(`${year}-${month}`, { year, month });
+  };
+
+  const current = currentPeriod();
+  add(current.year, current.month);
+  for (const transaction of transactions) {
+    const [year, month] = transaction.date.split('-').map(Number);
+    add(year, month);
+  }
+
+  return [...seen.values()].sort((a, b) => b.year - a.year || b.month - a.month);
 }
 
 function formatMonthYear(year: number, month: number): string {
@@ -62,6 +70,8 @@ export function DashboardPage() {
     const all = transactions ?? [];
     return selectedUserId === null ? all : all.filter((t) => t.userId === selectedUserId);
   }, [transactions, selectedUserId]);
+
+  const monthOptions = useMemo(() => monthOptionsFromTransactions(transactions ?? []), [transactions]);
 
   if (isSummaryLoading) {
     return <p className="text-gray-500 dark:text-gray-400">Loading…</p>;
@@ -94,7 +104,7 @@ export function DashboardPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
           <div className="flex flex-wrap items-center gap-3">
-            <MonthYearFilter period={selectedPeriod} onChange={setSelectedPeriod} />
+            <MonthYearFilter period={selectedPeriod} options={monthOptions} onChange={setSelectedPeriod} />
             <PersonFilter users={users ?? []} selectedUserId={selectedUserId} onChange={setSelectedUserId} />
           </div>
         </div>
@@ -267,7 +277,7 @@ function MiniMonthlyChart({
                 />
               )}
             </div>
-            {index % 2 === 0 && <span className="text-[10px] text-slate-400">{entry.month}</span>}
+            <span className="text-[10px] text-slate-400">{entry.month}</span>
           </div>
         );
       })}
@@ -277,12 +287,13 @@ function MiniMonthlyChart({
 
 function MonthYearFilter({
   period,
+  options,
   onChange,
 }: {
   period: { year: number; month: number };
+  options: { year: number; month: number }[];
   onChange: (period: { year: number; month: number }) => void;
 }) {
-  const options = useMemo(() => periodOptions(36), []);
   const value = `${period.year}-${period.month}`;
 
   return (
