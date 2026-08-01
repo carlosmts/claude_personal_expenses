@@ -1,13 +1,6 @@
-import { LayoutDashboard, Menu, PieChart, Receipt, Settings as SettingsIcon, Target } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-
-const NAV_ITEMS = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/transactions', label: 'Transactions', icon: Receipt, end: false },
-  { to: '/report', label: 'Report', icon: PieChart, end: false },
-  { to: '/plan', label: 'Plan', icon: Target, end: false },
-  { to: '/settings', label: 'Settings', icon: SettingsIcon, end: false },
-];
+import { NAV_ITEMS } from './navItems';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -17,7 +10,7 @@ interface SidebarProps {
 export function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
   return (
     <nav
-      className={`sticky top-0 flex h-screen shrink-0 flex-col border-r border-gray-100 bg-white py-6 text-gray-900 transition-all dark:border-gray-800 dark:bg-gray-900 dark:text-white ${
+      className={`sticky top-0 hidden h-screen shrink-0 flex-col border-r border-gray-100 bg-white py-6 text-gray-900 transition-all md:flex dark:border-gray-800 dark:bg-gray-900 dark:text-white ${
         collapsed ? 'w-20 px-2' : 'w-60 px-4'
       }`}
     >
