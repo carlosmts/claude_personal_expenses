@@ -22,7 +22,9 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="flex min-h-screen bg-slate-50 dark:bg-gray-900">
       <Sidebar collapsed={collapsed} onToggleCollapsed={toggleCollapsed} />
-      <main className="min-w-0 flex-1 overflow-x-auto p-4 pb-24 md:p-8 md:pb-8">{children}</main>
+      <main className="min-w-0 flex-1 overflow-x-auto px-4 pb-24 pt-[max(1rem,env(safe-area-inset-top))] md:px-8 md:pt-8 md:pb-8">
+        {children}
+      </main>
       <MobileNav />
     </div>
   );
